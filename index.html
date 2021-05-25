@@ -1,0 +1,28 @@
+<head>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+    <title>360 Video Demo</title>
+    <script src="node_modules/video.js/dist/video.js"></script>
+    <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>    
+</head>
+
+<style>
+#myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+}
+</style>
+
+<body>
+  <video width=1200 height=664 id="myVideo" class="video-js vjs-big-play-centered" controls >
+    <source src="360small.mp4" type="video/mp4">
+  </video>  
+  <script>
+    var player = videojs('myVideo');
+    player.mediainfo = player.mediainfo || {};
+    player.mediainfo.projection = '360';
+    player.vr();
+  </script>      
+</body>
