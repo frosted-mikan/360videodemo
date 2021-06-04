@@ -1,18 +1,21 @@
+<!DOCTYPE html>
 <head>
-    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
-    <title>360 Video Demo</title>
-    <script src="node_modules/video.js/dist/video.js"></script>
-    <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>    
+  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <title>360 Video Demo</title>
+  <script src="/node_modules/video.js/dist/video.js"></script>
+  <script src="/node_modules/videojs-vr/dist/videojs-vr.js"></script>    
+  <script src="/script/three.js"></script>
+  <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
 
 <style>
-#myVideo {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  min-width: 100%;
-  min-height: 100%;
-}
+  #myVideo {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+  }
 </style>
 
 <body>
@@ -25,4 +28,83 @@
     player.mediainfo.projection = '360';
     player.vr();
   </script>      
+
+  <script type="module">
+    import {VRButton} from '/script/VRButton.js';
+
+    var scene = new THREE.Scene();
+    // scene.background = new THREE.Color(0x505050);
+
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.6, 0);
+    camera.lookAt(0, 1, -1.8);
+
+    var renderer = new THREE.WebGLRenderer({alpha: true});
+    //alpha:true vs antialias:true
+    renderer.setClearColor(0x000000, 0); // the default
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.xr.enabled = true;
+    document.body.appendChild(VRButton.createButton(renderer));
+    document.body.appendChild(renderer.domElement);
+
+    renderer.setAnimationLoop(loop);
+
+    makeUI();
+
+    function loop() {
+      ThreeMeshUI.update();
+      renderer.render(scene, camera);
+    };
+
+    function makeUI() {
+      const container = new ThreeMeshUI.Block({
+        height: 1,
+        width: 2.5
+      });
+      
+      container.position.set(0, 1, -1.8);
+      container.rotation.x = -0.55;
+      scene.add(container);	
+
+      const menu = new ThreeMeshUI.Block({
+        height: 0.6,
+        width: 2.5,
+        offset: 0,
+        alignContent: 'center', 
+        justifyContent: 'center', 
+        padding: 0.03
+      });
+
+      const video = new ThreeMeshUI.Block({
+        height: 0.27,
+        width: 2,
+        margin: 0.05,
+        offset: 0
+      });
+
+      container.add(menu, video);
+
+      const loader = new THREE.TextureLoader();
+
+      loader.load('/assets/videoplayer.jpg', (texture)=> {
+        video.set({backgroundTexture: texture});
+      });
+
+      container.set({
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
+      });
+        
+      const text = new ThreeMeshUI.Text({
+        content: 'transcript    details    clips    share    cite'
+      });
+
+      menu.add(text);
+
+      text.set({
+        fontColor: new THREE.Color(0xFFFFFF),
+        fontSize: 0.1
+      });
+    }
+  </script>
 </body>
