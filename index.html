@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
   <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css"> <!-- Custom style -->
   <title>360 Video Demo</title>
   <script src="node_modules/video.js/dist/video.js"></script>
   <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>    
@@ -8,20 +9,43 @@
   <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
 
-<style>
-  #myVideo {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    min-width: 100%;
-    min-height: 100%;
-  }
-</style>
-
 <body>
+
+<!-- ------------------------------------------------------------------- -->
+<!-- Popup test -->
+<div id="popup" class="popup">
+  <div class="content">
+    <span class="close">&times;</span>
+    <p>We the people, in order to form a more perfect union, establish
+      justice, ensure domestic tranquility, provide for the common defense, promote the general welfare,
+      and secure the blessings of liberty for ourselves and our posterity, do ordain and establish
+      this constitution for the United States of America.
+    </p>
+  </div>
+</div>
+
+<!-- JS for the popup -->
+<script>
+  var popup = document.getElementById("popup");
+  var span = document.getElementsByClassName("close")[0];
+
+  span.onclick = function() {
+    popup.style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    if (event.target == popup) {
+      popup.style.display = "none";
+    }
+  }
+</script>
+
+<!-- ------------------------------------------------------------------- -->
+
   <video width=1200 height=664 id="myVideo" class="video-js vjs-big-play-centered" controls >
     <source src="360small.mp4" type="video/mp4">
   </video>  
+
   <script>
     var player = videojs('myVideo');
     player.mediainfo = player.mediainfo || {};
@@ -30,6 +54,7 @@
   </script>      
 
   <script type="module">
+    // use /script/VRButton.js for localhost (and in assets path)
     import {VRButton} from '/360videodemo/script/VRButton.js';
 
     var scene = new THREE.Scene();
