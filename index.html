@@ -30,7 +30,7 @@
   </script>      
 
   <script type="module">
-    import {VRButton} from '/script/VRButton.js';
+    import {VRButton} from 'script/VRButton.js';
 
     var scene = new THREE.Scene();
     // scene.background = new THREE.Color(0x505050);
@@ -86,13 +86,13 @@
 
       const loader = new THREE.TextureLoader();
 
-      loader.load('/assets/videoplayer.jpg', (texture)=> {
+      loader.load('assets/videoplayer.jpg', (texture)=> {
         video.set({backgroundTexture: texture});
       });
 
       container.set({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: 'assets/Roboto-msdf.json',
+        fontTexture: 'assets/Roboto-msdf.png',
       });
         
       const text = new ThreeMeshUI.Text({
