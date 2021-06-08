@@ -29,6 +29,14 @@
   var popup = document.getElementById("popup");
   var span = document.getElementsByClassName("close")[0];
 
+  // popup appears after 10 seconds 
+  window.onload = function() {
+    setTimeout(function() {
+        popup.style.display = 'block';
+    }, 10000);
+  }
+
+  // click to close popup
   span.onclick = function() {
     popup.style.display = "none";
   }
