@@ -12,7 +12,7 @@
 <body>
 
 <!-- ------------------------------------------------------------------- -->
-<!-- Popup test -->
+<!-- Normal Popup test -->
 <div id="popup" class="popup">
   <div class="content">
     <span class="close">&times;</span>
@@ -47,39 +47,73 @@
     }
   }
 </script>
-
 <!-- ------------------------------------------------------------------- -->
 
   <video width=1200 height=664 id="myVideo" class="video-js vjs-big-play-centered" controls >
     <source src="360small.mp4" type="video/mp4">
   </video>  
 
-  <script>
+  <!-- <script>
     var player = videojs('myVideo');
     player.mediainfo = player.mediainfo || {};
     player.mediainfo.projection = '360';
     player.vr();
-  </script>      
+  </script>       -->
 
   <script type="module">
     // use /script/VRButton.js for localhost (and in assets path)
+    // use /360videodemo/script/VRButton.js for github pages
     import {VRButton} from '/360videodemo/script/VRButton.js';
 
+    var player = videojs('myVideo');
+    player.mediainfo = player.mediainfo || {};
+    player.mediainfo.projection = '360';
+    player.vr();
+
+    // videojs modal test
+    player.on('pause', function() {
+      var words = document.createElement('p');
+      words.innerHTML = "this is a test with some words";
+      words.classList.add('para');
+
+      var button = document.createElement('button');
+      button.innerHTML = "BUTTON";
+      button.classList.add('button');
+      button.onclick = function(){
+        button.style.color = 'red';
+      };
+      var content = document.createElement('div');
+      content.classList.add('content');
+      content.appendChild(words);
+      content.appendChild(button);
+
+      var modal = player.createModal(content);
+      modal.addClass('popup');
+
+      modal.on('modalclose', function() {
+        player.play();
+      });
+    });
+
+
     var scene = new THREE.Scene();
+    player.vr().scene = scene;
     // scene.background = new THREE.Color(0x505050);
 
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     camera.position.set(0, 1.6, 0);
     camera.lookAt(0, 1, -1.8);
+    player.vr().camera = camera;
 
     var renderer = new THREE.WebGLRenderer({alpha: true});
-    //alpha:true vs antialias:true
+    //alpha:true (for transparent) vs antialias:true
     renderer.setClearColor(0x000000, 0); // the default
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
     document.body.appendChild(VRButton.createButton(renderer));
     document.body.appendChild(renderer.domElement);
 
+    player.vr().renderer = renderer;
     renderer.setAnimationLoop(loop);
 
     makeUI();
@@ -119,10 +153,14 @@
 
       const loader = new THREE.TextureLoader();
 
+      // use /assets/videoplayer.jpg for localhost
+      // use /360videodemo/assets/videoplayer.jpg for git
       loader.load('/360videodemo/assets/videoplayer.jpg', (texture)=> {
         video.set({backgroundTexture: texture});
       });
 
+      // use /assets/Roboto-msdf.json for localhost
+      // use /360videodemo/assets/Roboto-msdf.json for git
       container.set({
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png',

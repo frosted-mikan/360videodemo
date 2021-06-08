@@ -8,7 +8,7 @@
 
 /* Popup style */
 .popup {
-    display: none; 
+    display: block; 
     position: fixed; 
     z-index: 1; 
     left: 0;
@@ -21,7 +21,7 @@
   }
   
   .content {
-    background-color: #fefefe;
+    background-color: #3d3d3d;
     margin: 15% auto; 
     padding: 20px;
     border: 1px solid #888;
@@ -40,4 +40,12 @@
     color: black;
     text-decoration: none;
     cursor: pointer;
+  }
+
+  .para {
+    color:black;
+  }
+
+  .button {
+    font-size: 50px !important;
   }
