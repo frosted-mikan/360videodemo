@@ -71,7 +71,7 @@
 
         for (let i = 0; i < uvs2.length; i += 2) {
           uvs2[i] *= 0.5;
-          // uvs2[i] += 0.5;
+          // uvs2[i] += 0.5; // for stereoscopic view
         }
 
         const material2 = new THREE.MeshBasicMaterial({map: texture});
@@ -110,14 +110,36 @@
     }
 
     function makeUI() {
-      const container = new ThreeMeshUI.Block({
+      const container = new THREE.Group();
+      container.position.set( 0, 1.4, -1.2 );
+      container.rotation.x = -0.15;
+      scene.add( container );
+
+      // textPanel will be the popups - have multiple of these in the group Container
+      // use /assets/Roboto-msdf.json for localhost
+      // use /360videodemo/assets/Roboto-msdf.json for git
+      const popup = new ThreeMeshUI.Block({
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        height: 2.2,
+        width: 2,
+        alignContent: 'left', 
+        justifyContent: 'start', 
+        padding: 0.1
+      });
+
+      popup.position.set(0, 1.1, 0);
+      container.add(popup);
+
+
+      // menuContain container has the menu
+      const menuContain = new ThreeMeshUI.Block({
         height: 1,
         width: 2.5
       });
-      
-      container.position.set(0, 1, -1.8);
-      container.rotation.x = -0.55;
-      scene.add(container);	
+      menuContain.position.set(0, 0.88, -1);
+      menuContain.rotation.x = -0.55;
+      scene.add(menuContain);
 
       const menu = new ThreeMeshUI.Block({
         height: 0.6,
@@ -135,7 +157,7 @@
         offset: 0
       });
 
-      container.add(menu, video);
+      menuContain.add(menu, video);
 
       const loader = new THREE.TextureLoader();
 
@@ -147,18 +169,29 @@
 
       // use /assets/Roboto-msdf.json for localhost
       // use /360videodemo/assets/Roboto-msdf.json for git
-      container.set({
+      menuContain.set({
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png',
       });
         
       const text = new ThreeMeshUI.Text({
-        content: 'transcript    details    clips    share    cite'
+        content: 'Transcript    Details    Clips    Share    Cite'
       });
 
       menu.add(text);
 
+      const popuptext = new ThreeMeshUI.Text({
+          content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017'
+        });
+      popup.add(popuptext);
+    
+
       text.set({
+        fontColor: new THREE.Color(0xFFFFFF),
+        fontSize: 0.1
+      });
+
+      popuptext.set({
         fontColor: new THREE.Color(0xFFFFFF),
         fontSize: 0.1
       });
