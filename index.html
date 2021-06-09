@@ -23,9 +23,39 @@
 
     let camera, scene, renderer;
 
+
+    // const raycaster = new THREE.Raycaster();
+
+    // const mouse = new THREE.Vector2();
+    // mouse.x = mouse.y = null;
+
+    // let selectState = false;
+
+    // window.addEventListener( 'pointermove', ( event )=>{
+    //   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    //   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // });
+
+    // window.addEventListener( 'pointerdown', ()=> { selectState = true });
+
+    // window.addEventListener( 'pointerup', ()=> { selectState = false });
+
+    // window.addEventListener( 'touchstart', ( event )=> {
+    //   selectState = true;
+    //   mouse.x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
+    //   mouse.y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
+    // });
+
+    // window.addEventListener( 'touchend', ()=> {
+    //   selectState = false;
+    //   mouse.x = null;
+    //   mouse.y = null;
+    // });
+
+
     init();
     animate();
-    makeUI();
+    // makeUI();
 
     function init() {
         const container = document.getElementById('container');
@@ -91,6 +121,9 @@
         document.body.appendChild(VRButton.createButton(renderer));
 
         window.addEventListener('resize', onWindowResize);
+
+        createController(0);
+        createController(1);
     }
 
     function onWindowResize() {
@@ -109,11 +142,40 @@
       renderer.render(scene, camera);
     }
 
+    function createController(controllerId) {
+      const controller = renderer.xr.getController(controllerId);
+      camera.add(controller);
+
+      // Trigger controller 
+      controller.addEventListener('selectstart', () => { 
+        console.log("selectstart");
+        makeUI();
+      });
+      controller.addEventListener('selectend', () => { 
+        console.log("selectend");
+        deleteUI();
+      });
+    }
+
+    function deleteUI() {
+      let array = [];
+      scene.traverse(function(object) {
+        if (object.name == "UI"){
+          console.log(object);
+          array.push(object);
+        }
+      });
+      array.forEach(function(object){
+        scene.remove(object);
+      });
+    }
+
     function makeUI() {
-      const container = new THREE.Group();
-      container.position.set( 0, 1.4, -1.2 );
+      const container = new ThreeMeshUI.Block({});
+      container.name = "UI";
+      container.position.set( 0, 1.63, -1.2 );
       container.rotation.x = -0.15;
-      scene.add( container );
+      scene.add(container);
 
       // textPanel will be the popups - have multiple of these in the group Container
       // use /assets/Roboto-msdf.json for localhost
@@ -137,6 +199,8 @@
         height: 0.4,
         width: 1.25
       });
+
+      menuContain.name = "UI";
       menuContain.position.set(0, 0.88, -1);
       menuContain.rotation.x = -0.55;
       scene.add(menuContain);
