@@ -10,118 +10,104 @@
 </head>
 
 <body>
+  <div id="container"></div>
 
-<!-- ------------------------------------------------------------------- -->
-<!-- Normal Popup test -->
-<div id="popup" class="popup">
-  <div class="content">
-    <span class="close">&times;</span>
-    <p>We the people, in order to form a more perfect union, establish
-      justice, ensure domestic tranquility, provide for the common defense, promote the general welfare,
-      and secure the blessings of liberty for ourselves and our posterity, do ordain and establish
-      this constitution for the United States of America.
-    </p>
-  </div>
-</div>
-
-<!-- JS for the popup -->
-<script>
-  var popup = document.getElementById("popup");
-  var span = document.getElementsByClassName("close")[0];
-
-  // popup appears after 10 seconds 
-  window.onload = function() {
-    setTimeout(function() {
-        popup.style.display = 'block';
-    }, 10000);
-  }
-
-  // click to close popup
-  span.onclick = function() {
-    popup.style.display = "none";
-  }
-
-  window.onclick = function(event) {
-    if (event.target == popup) {
-      popup.style.display = "none";
-    }
-  }
-</script>
-<!-- ------------------------------------------------------------------- -->
-
-  <video width=1200 height=664 id="myVideo" class="video-js vjs-big-play-centered" controls >
+  <video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
     <source src="360small.mp4" type="video/mp4">
   </video>  
 
-  <!-- <script>
-    var player = videojs('myVideo');
-    player.mediainfo = player.mediainfo || {};
-    player.mediainfo.projection = '360';
-    player.vr();
-  </script>       -->
-
   <script type="module">
-    // use /script/VRButton.js for localhost (and in assets path)
+    // use /script/VRButton.js for localhost
     // use /360videodemo/script/VRButton.js for github pages
     import {VRButton} from '/360videodemo/script/VRButton.js';
 
-    var player = videojs('myVideo');
-    player.mediainfo = player.mediainfo || {};
-    player.mediainfo.projection = '360';
-    player.vr();
+    let camera, scene, renderer;
 
-    // videojs modal test
-    player.on('pause', function() {
-      var words = document.createElement('p');
-      words.innerHTML = "this is a test with some words";
-      words.classList.add('para');
-
-      var button = document.createElement('button');
-      button.innerHTML = "BUTTON";
-      button.classList.add('button');
-      button.onclick = function(){
-        button.style.color = 'red';
-      };
-      var content = document.createElement('div');
-      content.classList.add('content');
-      content.appendChild(words);
-      content.appendChild(button);
-
-      var modal = player.createModal(content);
-      modal.addClass('popup');
-
-      modal.on('modalclose', function() {
-        player.play();
-      });
-    });
-
-
-    var scene = new THREE.Scene();
-    player.vr().scene = scene;
-    // scene.background = new THREE.Color(0x505050);
-
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 1.6, 0);
-    camera.lookAt(0, 1, -1.8);
-    player.vr().camera = camera;
-
-    var renderer = new THREE.WebGLRenderer({alpha: true});
-    //alpha:true (for transparent) vs antialias:true
-    renderer.setClearColor(0x000000, 0); // the default
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-    document.body.appendChild(VRButton.createButton(renderer));
-    document.body.appendChild(renderer.domElement);
-
-    player.vr().renderer = renderer;
-    renderer.setAnimationLoop(loop);
-
+    init();
+    animate();
     makeUI();
 
-    function loop() {
+    function init() {
+        const container = document.getElementById('container');
+        container.addEventListener('click', function() {
+            video.play();
+        });
+
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.layers.enable(1); // render left view when no stereo available
+
+        // Video
+        const video = document.getElementById('video');
+        video.play();
+
+        const texture = new THREE.VideoTexture(video);
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x101010);
+
+        // Left eye
+        const geometry1 = new THREE.SphereGeometry(500, 60, 40);
+        // invert the geometry on the x-axis so that all of the faces point inward
+        geometry1.scale(-1, 1, 1);
+
+        const uvs1 = geometry1.attributes.uv.array;
+
+        for (let i = 0; i < uvs1.length; i += 2) {
+          uvs1[i] *= 0.5;
+        }
+
+        const material1 = new THREE.MeshBasicMaterial({map: texture});
+
+        const mesh1 = new THREE.Mesh(geometry1, material1);
+        mesh1.rotation.y = - Math.PI / 2;
+        mesh1.layers.set(1); // display in left eye only
+        scene.add(mesh1);
+
+        // Right eye
+        const geometry2 = new THREE.SphereGeometry(500, 60, 40);
+        geometry2.scale(-1, 1, 1);
+
+        const uvs2 = geometry2.attributes.uv.array;
+
+        for (let i = 0; i < uvs2.length; i += 2) {
+          uvs2[i] *= 0.5;
+          uvs2[i] += 0.5;
+        }
+
+        const material2 = new THREE.MeshBasicMaterial({map: texture});
+
+        const mesh2 = new THREE.Mesh(geometry2, material2);
+        mesh2.rotation.y = - Math.PI / 2;
+        mesh2.layers.set(2); // display in right eye only
+        scene.add(mesh2);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        renderer.xr.setReferenceSpaceType('local');
+        container.appendChild(renderer.domElement);
+
+        document.body.appendChild(VRButton.createButton(renderer));
+
+        window.addEventListener('resize', onWindowResize);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      renderer.setAnimationLoop(render);
+    }
+
+    function render() {
       ThreeMeshUI.update();
       renderer.render(scene, camera);
-    };
+    }
 
     function makeUI() {
       const container = new ThreeMeshUI.Block({
@@ -155,7 +141,7 @@
 
       // use /assets/videoplayer.jpg for localhost
       // use /360videodemo/assets/videoplayer.jpg for git
-      loader.load('/360videodemo/assets/videoplayer.jpg', (texture)=> {
+      loader.load('/assets/videoplayer.jpg', (texture)=> {
         video.set({backgroundTexture: texture});
       });
 
@@ -177,5 +163,6 @@
         fontSize: 0.1
       });
     }
+
   </script>
 </body>
