@@ -19,7 +19,7 @@
   <script type="module">
     // use /script/VRButton.js for localhost
     // use /360videodemo/script/VRButton.js for github pages
-    import {VRButton} from '/360videodemo/script/VRButton.js';
+    import {VRButton} from '/script/VRButton.js';
 
     let camera, scene, renderer;
 
@@ -71,7 +71,7 @@
 
         for (let i = 0; i < uvs2.length; i += 2) {
           uvs2[i] *= 0.5;
-          uvs2[i] += 0.5;
+          // uvs2[i] += 0.5;
         }
 
         const material2 = new THREE.MeshBasicMaterial({map: texture});
@@ -148,8 +148,8 @@
       // use /assets/Roboto-msdf.json for localhost
       // use /360videodemo/assets/Roboto-msdf.json for git
       container.set({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
       });
         
       const text = new ThreeMeshUI.Text({
