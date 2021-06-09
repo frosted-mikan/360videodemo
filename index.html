@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <head>
-  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <!-- <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" /> -->
   <link rel="stylesheet" href="style.css"> <!-- Custom style -->
   <title>360 Video Demo</title>
-  <script src="node_modules/video.js/dist/video.js"></script>
-  <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>    
+  <!-- <script src="node_modules/video.js/dist/video.js"></script>
+  <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>     -->
   <script src="script/three.js"></script>
   <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
@@ -121,39 +121,39 @@
       const popup = new ThreeMeshUI.Block({
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png',
-        height: 2.2,
-        width: 2,
+        height: 1.1,
+        width: 1,
         alignContent: 'left', 
         justifyContent: 'start', 
         padding: 0.1
       });
 
-      popup.position.set(0, 1.1, 0);
+      popup.position.set(0, 0.25, 0);
       container.add(popup);
 
 
       // menuContain container has the menu
       const menuContain = new ThreeMeshUI.Block({
-        height: 1,
-        width: 2.5
+        height: 0.4,
+        width: 1.25
       });
       menuContain.position.set(0, 0.88, -1);
       menuContain.rotation.x = -0.55;
       scene.add(menuContain);
 
       const menu = new ThreeMeshUI.Block({
-        height: 0.6,
-        width: 2.5,
+        height: 0.2,
+        width: 1.25,
         offset: 0,
         alignContent: 'center', 
         justifyContent: 'center', 
-        padding: 0.03
+        padding: 0.01
       });
 
       const video = new ThreeMeshUI.Block({
-        height: 0.27,
-        width: 2,
-        margin: 0.05,
+        height: 0.135,
+        width: 1,
+        margin: 0,
         offset: 0
       });
 
@@ -188,12 +188,12 @@
 
       text.set({
         fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.1
+        fontSize: 0.05
       });
 
       popuptext.set({
         fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.1
+        fontSize: 0.05
       });
     }
 
