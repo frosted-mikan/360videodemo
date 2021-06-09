@@ -19,7 +19,7 @@
   <script type="module">
     // use /script/VRButton.js for localhost
     // use /360videodemo/script/VRButton.js for github pages
-    import {VRButton} from '/script/VRButton.js';
+    import {VRButton} from '/360videodemo/script/VRButton.js';
 
     let camera, scene, renderer;
 
@@ -141,15 +141,15 @@
 
       // use /assets/videoplayer.jpg for localhost
       // use /360videodemo/assets/videoplayer.jpg for git
-      loader.load('/assets/videoplayer.jpg', (texture)=> {
+      loader.load('/360videodemo/assets/videoplayer.jpg', (texture)=> {
         video.set({backgroundTexture: texture});
       });
 
       // use /assets/Roboto-msdf.json for localhost
       // use /360videodemo/assets/Roboto-msdf.json for git
       container.set({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
       });
         
       const text = new ThreeMeshUI.Text({
