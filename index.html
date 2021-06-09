@@ -148,12 +148,11 @@
 
       // Trigger controller 
       controller.addEventListener('selectstart', () => { 
-        console.log("selectstart");
-        makeUI();
-      });
-      controller.addEventListener('selectend', () => { 
-        console.log("selectend");
-        deleteUI();
+        if (scene.getObjectByName('UI')){
+          deleteUI();
+        } else {
+          makeUI();
+        }
       });
     }
 
