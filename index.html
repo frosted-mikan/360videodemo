@@ -5,7 +5,7 @@
   <title>360 Video Demo</title>
   <!-- <script src="node_modules/video.js/dist/video.js"></script>
   <script src="node_modules/videojs-vr/dist/videojs-vr.js"></script>     -->
-  <script src="script/three.js"></script>
+  <!-- <script src="script/three.js"></script> -->
   <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
 
@@ -19,43 +19,48 @@
   <script type="module">
     // use /script/VRButton.js for localhost
     // use /360videodemo/script/VRButton.js for github pages
-    import {VRButton} from '/360videodemo/script/VRButton.js';
+    import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
+    import { VRButton } from '/script/VRButton.js';
+    import VRControl from '/script/VRControl.js';
+    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
-    let camera, scene, renderer;
+    let camera, scene, renderer, vrControl, controls;
+    let objsToTest = [];
 
 
-    // const raycaster = new THREE.Raycaster();
+    const raycaster = new THREE.Raycaster();
 
-    // const mouse = new THREE.Vector2();
-    // mouse.x = mouse.y = null;
+    const mouse = new THREE.Vector2();
+    mouse.x = mouse.y = null;
 
-    // let selectState = false;
+    let selectState = false;
 
-    // window.addEventListener( 'pointermove', ( event )=>{
-    //   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    //   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    // });
+    window.addEventListener('pointermove', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    });
 
-    // window.addEventListener( 'pointerdown', ()=> { selectState = true });
+    window.addEventListener('pointerdown', () => {selectState = true});
 
-    // window.addEventListener( 'pointerup', ()=> { selectState = false });
+    window.addEventListener('pointerup', () => {selectState = false});
 
-    // window.addEventListener( 'touchstart', ( event )=> {
-    //   selectState = true;
-    //   mouse.x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
-    //   mouse.y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
-    // });
+    window.addEventListener('touchstart', (event) => {
+      selectState = true;
+      mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    });
 
-    // window.addEventListener( 'touchend', ()=> {
-    //   selectState = false;
-    //   mouse.x = null;
-    //   mouse.y = null;
-    // });
+    window.addEventListener('touchend', () => {
+      selectState = false;
+      mouse.x = null;
+      mouse.y = null;
+    });
 
 
     init();
     animate();
-    // makeUI();
+    makeMenuUI(); //for testing
+    // makePopupUI(); //for testing
 
     function init() {
         const container = document.getElementById('container');
@@ -118,12 +123,29 @@
         renderer.xr.setReferenceSpaceType('local');
         container.appendChild(renderer.domElement);
 
+        // Orbit controls for no VR
+        controls = new OrbitControls( camera, renderer.domElement );
+        camera.position.set( 0, 1.6, 0 );
+        controls.target = new THREE.Vector3( 0, 1, -1.8 );
+
         document.body.appendChild(VRButton.createButton(renderer));
 
         window.addEventListener('resize', onWindowResize);
 
-        createController(0);
-        createController(1);
+        ////////////////
+        // Controllers: TODO: see how they work with createController()? 
+        ////////////////
+
+        vrControl = VRControl(renderer, camera, scene);
+
+        scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
+
+        vrControl.controllers[0].addEventListener('selectstart', () => {selectState = true});
+        vrControl.controllers[0].addEventListener('selectend', () => {selectState = false});
+
+        // TODO: bind make/deleteUI to different button (not trigger button)?
+        // createController(0);
+        // createController(1); // probably only want right controller to be clickable
     }
 
     function onWindowResize() {
@@ -139,7 +161,9 @@
 
     function render() {
       ThreeMeshUI.update();
+      controls.update(); // for OrbitControls
       renderer.render(scene, camera);
+      updateButtons(); // for buttons 
     }
 
     function createController(controllerId) {
@@ -151,37 +175,38 @@
         if (scene.getObjectByName('UI')){
           deleteUI();
         } else {
-          makeUI();
+          makeMenuUI();
         }
       });
     }
 
+    //TODO: Add disappear after 10 sec 
     function deleteUI() {
       let array = [];
       scene.traverse(function(object) {
         if (object.name == "UI"){
-          console.log(object);
           array.push(object);
         }
       });
       array.forEach(function(object){
-        scene.remove(object);
+        scene.remove(object); //TODO: object.visible = false? 
       });
     }
 
-    function makeUI() {
+    // TODO: Have 'X' to close the popup
+    // Create Popup UI - called from makeMenuUI()
+    function makePopupUI(selection) {
       const container = new ThreeMeshUI.Block({});
       container.name = "UI";
       container.position.set( 0, 1.63, -1.2 );
       container.rotation.x = -0.15;
       scene.add(container);
 
-      // textPanel will be the popups - have multiple of these in the group Container
       // use /assets/Roboto-msdf.json for localhost
       // use /360videodemo/assets/Roboto-msdf.json for git
       const popup = new ThreeMeshUI.Block({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
@@ -189,14 +214,36 @@
         padding: 0.1
       });
 
-      popup.position.set(0, 0.25, 0);
+      popup.position.set(0, 0.005, 0);
       container.add(popup);
 
+      if (selection == "transcript"){
 
+      } else if (selection == "details"){
+        const popuptext = new ThreeMeshUI.Text({
+          content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017',
+          fontColor: new THREE.Color(0xFFFFFF),
+          fontSize: 0.05
+        });
+        popup.add(popuptext);
+      } else if (selection == "clips"){
+        // TODO: add extra popup for sign-in 
+      } else if (selection == "share"){
+
+      } else if (selection == "cite"){
+
+      }
+    
+    }
+
+    // MENU BUTTONS UI -------------------------------------------------------------------
+    function makeMenuUI() {
       // menuContain container has the menu
       const menuContain = new ThreeMeshUI.Block({
-        height: 0.4,
-        width: 1.25
+        height: 0.3,
+        width: 2.3,
+        justifyContent: 'center',
+        contentDirection: 'row-reverse', //for buttons to be horizontal
       });
 
       menuContain.name = "UI";
@@ -204,60 +251,177 @@
       menuContain.rotation.x = -0.55;
       scene.add(menuContain);
 
-      const menu = new ThreeMeshUI.Block({
-        height: 0.2,
-        width: 1.25,
-        offset: 0,
-        alignContent: 'center', 
-        justifyContent: 'center', 
-        padding: 0.01
+      // BUTTONS
+      const buttonOptions = {
+        width: 0.4,
+        height: 0.15,
+        justifyContent: 'center',
+        alignContent: 'center',
+        offset: 0.05,
+        margin: 0.02,
+        borderRadius: 0.075
+      };
+
+      // Options for component.setupState().
+      const hoveredStateAttributes = {
+        state: "hovered",
+        attributes: {
+          offset: 0.035,
+          backgroundColor: new THREE.Color(0x999999),
+          backgroundOpacity: 1,
+          fontColor: new THREE.Color(0xffffff)
+        },
+      };
+
+      const idleStateAttributes = {
+        state: "idle",
+        attributes: {
+          offset: 0.035,
+          backgroundColor: new THREE.Color(0x666666),
+          backgroundOpacity: 0.3,
+          fontColor: new THREE.Color(0xffffff)
+        },
+      };
+
+      // Create the menu buttons 
+      const buttonTranscript = new ThreeMeshUI.Block(buttonOptions);
+      const buttonDetails = new ThreeMeshUI.Block(buttonOptions);
+      const buttonClips = new ThreeMeshUI.Block(buttonOptions);
+      const buttonShare = new ThreeMeshUI.Block(buttonOptions);
+      const buttonCite = new ThreeMeshUI.Block(buttonOptions);
+
+      // Add text to the buttons
+      buttonTranscript.add(
+        new ThreeMeshUI.Text({content: "Transcript"})
+      );
+      buttonDetails.add(
+        new ThreeMeshUI.Text({content: "Details"})
+      );
+      buttonClips.add(
+        new ThreeMeshUI.Text({content: "Clips"})
+      );
+      buttonShare.add(
+        new ThreeMeshUI.Text({content: "Share"})
+      );
+      buttonCite.add(
+        new ThreeMeshUI.Text({content: "Cite"})
+      );
+
+      // Create states for the buttons
+      const selectedAttributes = {
+        offset: 0.02,
+        backgroundColor: new THREE.Color(0x777777),
+        fontColor: new THREE.Color(0x222222)
+      };
+
+      buttonTranscript.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: ()=> {
+          // TODO: show the appropriate popup here
+        }
       });
+      buttonTranscript.setupState(hoveredStateAttributes);
+      buttonTranscript.setupState(idleStateAttributes);
 
-      const video = new ThreeMeshUI.Block({
-        height: 0.135,
-        width: 1,
-        margin: 0,
-        offset: 0
+      buttonDetails.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: ()=> {
+          // TODO: show the appropriate popup here
+          makePopupUI('details');
+        }
       });
+      buttonDetails.setupState(hoveredStateAttributes);
+      buttonDetails.setupState(idleStateAttributes);
 
-      menuContain.add(menu, video);
-
-      const loader = new THREE.TextureLoader();
-
-      // use /assets/videoplayer.jpg for localhost
-      // use /360videodemo/assets/videoplayer.jpg for git
-      loader.load('/360videodemo/assets/videoplayer.jpg', (texture)=> {
-        video.set({backgroundTexture: texture});
+      buttonClips.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: ()=> {
+          // TODO: show the appropriate popup here
+        }
       });
+      buttonClips.setupState(hoveredStateAttributes);
+      buttonClips.setupState(idleStateAttributes);
+
+      buttonShare.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: ()=> {
+          // TODO: show the appropriate popup here
+        }
+      });
+      buttonShare.setupState(hoveredStateAttributes);
+      buttonShare.setupState(idleStateAttributes);
+
+      buttonCite.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: ()=> {
+          // TODO: show the appropriate popup here
+        }
+      });
+      buttonCite.setupState(hoveredStateAttributes);
+      buttonCite.setupState(idleStateAttributes);
+
+
+      // Add all buttons to menu
+      menuContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
+      objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
 
       // use /assets/Roboto-msdf.json for localhost
       // use /360videodemo/assets/Roboto-msdf.json for git
       menuContain.set({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
-      });
-        
-      const text = new ThreeMeshUI.Text({
-        content: 'Transcript    Details    Clips    Share    Cite'
-      });
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
+      });        
+    }
 
-      menu.add(text);
+    //
 
-      const popuptext = new ThreeMeshUI.Text({
-          content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017'
-        });
-      popup.add(popuptext);
-    
+    function updateButtons() {
+      let intersect;
 
-      text.set({
-        fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.05
+      if (renderer.xr.isPresenting) {
+        vrControl.setFromController(0, raycaster.ray);
+        intersect = raycast();
+
+        if (intersect) vrControl.setPointerAt(0, intersect.point);
+
+      } else if (mouse.x !== null && mouse.y !== null) {
+        raycaster.setFromCamera(mouse, camera);
+        intersect = raycast();
+      }
+
+      if (intersect && intersect.object.isUI) {
+        if (selectState) {
+          intersect.object.setState('selected');
+        } else {
+          intersect.object.setState('hovered');
+        }
+      }
+
+      objsToTest.forEach((obj) => {
+        if ((!intersect || obj !== intersect.object) && obj.isUI) {
+          obj.setState('idle');
+        }
       });
+    }
 
-      popuptext.set({
-        fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.05
-      });
+    //
+
+    function raycast() {
+      return objsToTest.reduce((closestIntersection, obj) => {
+        const intersection = raycaster.intersectObject(obj, true);
+        if (!intersection[0]) return closestIntersection;
+        if (!closestIntersection || intersection[0].distance < closestIntersection.distance) {
+          intersection[0].object = obj;
+          return intersection[0];
+        } else {
+          return closestIntersection;
+        }
+      }, null);
     }
 
   </script>
