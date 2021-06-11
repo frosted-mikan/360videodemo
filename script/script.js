@@ -40,7 +40,7 @@ window.addEventListener('touchend', () => {
 
 init();
 animate();
-makeMenuUI(); //for testing
+// makeMenuUI(); //for testing
 // makePopupUI(); //for testing
 
 function init() {
@@ -105,9 +105,9 @@ function init() {
     container.appendChild(renderer.domElement);
 
     // Orbit controls for no VR
-    controls = new OrbitControls( camera, renderer.domElement );
-    camera.position.set( 0, 1.6, 0 );
-    controls.target = new THREE.Vector3( 0, 1, -1.8 );
+    controls = new OrbitControls(camera, renderer.domElement);
+    camera.position.set(0, 1.6, 0);
+    controls.target = new THREE.Vector3(0, 1, -1.8);
 
     document.body.appendChild(VRButton.createButton(renderer));
 
@@ -121,8 +121,6 @@ function init() {
     vrControl.controllers[0].addEventListener('selectstart', () => {selectState = true});
     vrControl.controllers[0].addEventListener('selectend', () => {selectState = false});
 
-    // TODO: bind make/deleteUI to different button (not trigger button)?
-    // createController(0);
     // createController(1); // probably only want right controller to be clickable
 }
 
@@ -144,25 +142,25 @@ function render() {
     updateButtons(); // for buttons 
 }
 
-function createController(controllerId) {
-    const controller = renderer.xr.getController(controllerId);
-    camera.add(controller);
+// function createController(controllerId) {
+//     const controller = renderer.xr.getController(controllerId);
+//     camera.add(controller);
 
-    // Trigger controller 
-    controller.addEventListener('selectstart', () => { 
-        if (scene.getObjectByName('UI')){
-            deleteUI();
-        } else {
-            makeMenuUI();
-        }
-    });
-}
+//     // Trigger controller 
+//     controller.addEventListener('selectstart', () => { 
+//         if (scene.getObjectByName('UI')){
+//             deleteUI();
+//         } else {
+//             makeMenuUI();
+//         }
+//     });
+// }
 
 //TODO: Add disappear after 10 sec 
 function deleteUI() {
     let array = [];
     scene.traverse(function(object) {
-        if (object.name == "UI"){
+        if (object.name == "UI" || object.name == "popUI"){
             array.push(object);
         }
     });
@@ -463,6 +461,15 @@ function updateButtons() {
             intersect.object.setState('selected');
         } else {
             intersect.object.setState('hovered');
+        }
+    } else {
+        // Call up/dismiss menu when area outside UI is clicked (2743)
+        if (selectState) {
+            if (scene.getObjectByName('UI')){
+                deleteUI();
+            } else {
+                makeMenuUI();
+            }    
         }
     }
 
