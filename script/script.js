@@ -7,6 +7,7 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/js
 
 let camera, scene, renderer, vrControl, controls;
 let objsToTest = [];
+let popupsArr;
 
 
 const raycaster = new THREE.Raycaster();
@@ -37,11 +38,21 @@ window.addEventListener('touchend', () => {
     mouse.y = null;
 });
 
+// UI disappears if idle for 10 seconds: mouse ver. 
+var timeout;
+document.onmousemove = function() {
+  clearTimeout(timeout);
+  timeout = setTimeout(function() {
+      const curr = scene.getObjectByName('UI');
+      if (curr.visible){
+          deleteUI();
+      }
+    }, 10000);
+}
 
 init();
 animate();
-// makeMenuUI(); //for testing
-// makePopupUI(); //for testing
+makeMenuUI(); 
 
 function init() {
     const container = document.getElementById('container');
@@ -113,15 +124,12 @@ function init() {
 
     window.addEventListener('resize', onWindowResize);
 
-    // Controllers: TODO: see how they work with createController()? 
     vrControl = VRControl(renderer, camera, scene);
 
     scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
 
     vrControl.controllers[0].addEventListener('selectstart', () => {selectState = true});
     vrControl.controllers[0].addEventListener('selectend', () => {selectState = false});
-
-    // createController(1); // probably only want right controller to be clickable
 }
 
 function onWindowResize() {
@@ -142,21 +150,7 @@ function render() {
     updateButtons(); // for buttons 
 }
 
-// function createController(controllerId) {
-//     const controller = renderer.xr.getController(controllerId);
-//     camera.add(controller);
-
-//     // Trigger controller 
-//     controller.addEventListener('selectstart', () => { 
-//         if (scene.getObjectByName('UI')){
-//             deleteUI();
-//         } else {
-//             makeMenuUI();
-//         }
-//     });
-// }
-
-//TODO: Add disappear after 10 sec 
+// Hide visibility of all UI present 
 function deleteUI() {
     let array = [];
     scene.traverse(function(object) {
@@ -165,24 +159,32 @@ function deleteUI() {
         }
     });
     array.forEach(function(object){
-        scene.remove(object); // TODO: object.visible = false? 
+        object.visible = false;
     });
 }
 
 // Create Popup UI - called from makeMenuUI()
-function makePopupUI(selection) {
+function makePopupUI() {
     // use /assets/Roboto-msdf.json for localhost
     // use /360videodemo/assets/Roboto-msdf.json for git
-    const container = new ThreeMeshUI.Block({
+    const container = new THREE.Group({
+        height: 1.1,
+        width: 2, 
+        alignContent: 'right'
+    }); //contains all popup UI
+    const exitContain = new ThreeMeshUI.Block({ //contains exit button
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
-        backgroundOpacity: 0
+        height: 1.1,
+        width: 1,
+        padding: 0.05
     });
-    container.name = "popUI"; // TODO: this affects NUVO-2743
+    container.name = "popUI"; 
     container.position.set(0, 1.63, -1.2);
     container.rotation.x = -0.15;
+    container.add(exitContain);
     scene.add(container);
 
     // Options for component.setupState().
@@ -227,77 +229,200 @@ function makePopupUI(selection) {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
+            deletePopupUI(exit);
         }
     });
     exit.setupState(hoveredStateAttributes);
     exit.setupState(idleStateAttributes);
 
-    container.add(exit);
+    exitContain.add(exit);
     objsToTest.push(exit);
 
-    // Actual popup
-    const popup = new ThreeMeshUI.Block({
+    container.visible = false;
+
+    // Create actual popups
+    const popupAttributes = {
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
         justifyContent: 'start', 
-        padding: 0.1
+        padding: 0.1,
+        fontColor: new THREE.Color(0xFFFFFF),
+        fontSize: 0.05
+    };
+
+    const popTranscript = new ThreeMeshUI.Block(popupAttributes);
+    const popDetails = new ThreeMeshUI.Block(popupAttributes);
+    const popClips = new ThreeMeshUI.Block(popupAttributes);
+    const popShare = new ThreeMeshUI.Block(popupAttributes);
+    const popCite = new ThreeMeshUI.Block(popupAttributes);
+
+    popTranscript.position.set(0, 0.005, 0);
+    popDetails.position.set(0, 0.005, 0);
+    popClips.position.set(0, 0.005, 0);
+    popShare.position.set(0, 0.005, 0);
+    popCite.position.set(0, 0.005, 0);
+
+    //Signin popup block
+    const popSign = new ThreeMeshUI.Block(popupAttributes);
+    popSign.add(
+        new ThreeMeshUI.Text({
+            content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
+        })
+    );
+    popSign.position.set(1.1, 0.005, 0); //move to right
+
+    //Add exit to signin popup (deletePopupUI to parent obj)
+    // Signup Exit button 
+    const signExitContain = new ThreeMeshUI.Block({ //contains exit button
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        alignContent: 'right',
+        justifyContent: 'start',
+        height: 1.1,
+        width: 1,
+        padding: 0.05
     });
+    const signExit = new ThreeMeshUI.Block({
+        width: 0.08,
+        height: 0.08,
+        justifyContent: 'center',
+        alignContent: 'center'
+    });
+    signExit.add(
+        new ThreeMeshUI.Text({content:"X"})
+    );
 
-    popup.position.set(0, 0.005, 0);
-    container.add(popup);
+    signExit.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: () => {
+            deletePopupUI(signExit); 
+        }
+    });
+    signExit.setupState(hoveredStateAttributes);
+    signExit.setupState(idleStateAttributes);
 
-    if (selection == "transcript"){
-        const popuptext = new ThreeMeshUI.Text({
-            content: 'Transcript\n------ \n0:00:00 TRANSCRIPT OF VIDEO FILE:\n\n0:00:50 UNKNOWN: The dream is building machines that can go anywhere a person or animal can go, thats how I see the future',
-            fontColor: new THREE.Color(0xFFFFFF),
-            fontSize: 0.05
-        });
-        popup.add(popuptext);
-    } else if (selection == "details"){
-        const popuptext = new ThreeMeshUI.Text({
-            content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017',
-            fontColor: new THREE.Color(0xFFFFFF),
-            fontSize: 0.05
-        });
-        popup.add(popuptext);
-    } else if (selection == "clips"){
-        // TODO: add extra popup for sign-in 
-        const popuptext = new ThreeMeshUI.Text({
-            content: 'Clips\n------ \n\nNo Clips Found',
-            fontColor: new THREE.Color(0xFFFFFF),
-            fontSize: 0.05
-        });
-        popup.add(popuptext);
-    } else if (selection == "share"){
-        const popuptext = new ThreeMeshUI.Text({
-            content: 'Hello Robot\n\nDirected by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot',
-            fontColor: new THREE.Color(0xFFFFFF),
-            fontSize: 0.05
-        });
-        popup.add(popuptext);
-    } else if (selection == "cite"){
-        const popuptext = new ThreeMeshUI.Text({
-            content: 'Choose a citation style\n------ \nMLA8\n\n"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.',
-            fontColor: new THREE.Color(0xFFFFFF),
-            fontSize: 0.05
-        });
-        popup.add(popuptext);
-    }
+    signExitContain.add(signExit);
+    objsToTest.push(signExit);
+
+    popSign.add(signExitContain);
+
+    //Button on signin to submit 
+    const submitBut = new ThreeMeshUI.Block({
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: 0.1, 
+        width: 0.2, 
+        contentDirection: 'row-reverse'
+    });
+    submitBut.add(
+        new ThreeMeshUI.Text({
+            content: 'Submit'
+        })
+    );
+    //Config for submit button 
+    submitBut.setupState({
+        state: "selected",
+        attributes:selectedAttributes,
+        onSet: () => {
+            //make signin popup disappear
+            popSign.visible = false;
+            //Update clips popup
+            //delete existing children of popClips
+            for (var i = popClips.children.length - 1; i >= 0; i--) {
+                popClips.remove(popClips.children[i]);
+            }
+            //add new clip static text
+            popClips.add(
+                new ThreeMeshUI.Text({
+                    content: 'Clips\n------ \n\n 0:00:00 A new clip here'
+                })
+            );        
+        }
+    });
+    submitBut.setupState(hoveredStateAttributes);
+    submitBut.setupState(idleStateAttributes);
+    objsToTest.push(submitBut);
+    popSign.add(submitBut);
+
+    //Add signin popup to container
+    popSign.visible = false;
+    container.add(popSign);
+    
+    //Button on Clips popup to signin
+    const signinBut = new ThreeMeshUI.Block({
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: 0.1, 
+        width: 0.3, 
+        contentDirection: 'row-reverse'
+    });
+    signinBut.add(
+        new ThreeMeshUI.Text({
+            content: 'Create Clip'
+        })
+    );
+
+    //Config for signin button 
+    signinBut.setupState({
+        state: "selected",
+        attributes:selectedAttributes,
+        onSet: () => {
+            //make signin popup appear
+            popSign.visible = true;
+        }
+    });
+    signinBut.setupState(hoveredStateAttributes);
+    signinBut.setupState(idleStateAttributes);
+    objsToTest.push(signinBut);
+    popClips.add(signinBut);
+    
+    popTranscript.add(
+        new ThreeMeshUI.Text({
+            content: 'Transcript\n------ \n0:00:00 TRANSCRIPT OF VIDEO FILE:\n\n0:00:50 UNKNOWN: The dream is building machines that can go anywhere a person or animal can go, thats how I see the future'
+        })
+    );
+    popDetails.add(
+        new ThreeMeshUI.Text({
+            content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017'
+        })
+    );
+    popClips.add(
+        new ThreeMeshUI.Text({
+            content: 'Clips\n------ \n\nNo Clips Found'
+        }),
+    );
+    popShare.add(
+        new ThreeMeshUI.Text({
+            content: 'Hello Robot\n\nDirected by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot'
+        })
+    );
+    popCite.add(
+        new ThreeMeshUI.Text({
+            content: 'Choose a citation style\n------ \nMLA8\n\n"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.'
+        })
+    );
+        
+    popTranscript.visible = popDetails.visible = popClips.visible = popShare.visible = popCite.visible = false;
+    container.add(popTranscript, popDetails, popClips, popShare, popCite);
+    
+    // Toggle visibility between popups
+    popupsArr = [popTranscript, popDetails, popClips, popShare, popCite];
 
 }
 
-function deletePopupUI() {
-    // TODO: object visible = false? 
-    if (scene.getObjectByName('popUI')){
-        console.log('popup found');
-    }
-    const currpopup = scene.getObjectByName('popUI');
-    console.log(currpopup);
-    scene.remove(currpopup);
+function deletePopupUI(obj) {
+    //obj: exit, obj.parent: exitContain, obj.parent.parent: container or popSign
+    const curr = obj.parent.parent;
+    // const curr = scene.getObjectByName('popUI');
+    curr.visible = false;
 }
 
 // MENU BUTTONS UI -------------------------------------------------------------------
@@ -374,6 +499,9 @@ function makeMenuUI() {
         new ThreeMeshUI.Text({content: "Cite"})
     );
 
+    // Create all popups (all default hidden) in popupsArr
+    makePopupUI();
+
     // Create states for the buttons
     const selectedAttributes = {
         offset: 0.02,
@@ -385,8 +513,7 @@ function makeMenuUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
-            makePopupUI('transcript');
+            showPop(0);
         }
     });
     buttonTranscript.setupState(hoveredStateAttributes);
@@ -396,8 +523,7 @@ function makeMenuUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
-            makePopupUI('details');
+            showPop(1);
         }
     });
     buttonDetails.setupState(hoveredStateAttributes);
@@ -407,8 +533,7 @@ function makeMenuUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
-            makePopupUI('clips');
+            showPop(2);
         }
     });
     buttonClips.setupState(hoveredStateAttributes);
@@ -418,8 +543,7 @@ function makeMenuUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
-            makePopupUI('share');
+            showPop(3);
         }
     });
     buttonShare.setupState(hoveredStateAttributes);
@@ -429,8 +553,7 @@ function makeMenuUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI();
-            makePopupUI('cite');
+            showPop(4);
         }
     });
     buttonCite.setupState(hoveredStateAttributes);
@@ -440,6 +563,24 @@ function makeMenuUI() {
     menuContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
     objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
 
+    menuContain.visible = false;
+
+}
+
+// Make the chosen popup visible, hide all others
+function showPop(id) {
+    const curr = scene.getObjectByName('popUI');
+    if (!curr.visible){
+        curr.visible = true;
+    }
+	popupsArr.forEach((pop, i) => {
+		pop.visible = i === id ? true : false;
+	});
+};
+
+function menuUIVisible() {
+    const curr = scene.getObjectByName('UI');
+    curr.visible = true;
 }
 
 function updateButtons() {
@@ -465,10 +606,11 @@ function updateButtons() {
     } else {
         // Call up/dismiss menu when area outside UI is clicked (2743)
         if (selectState) {
-            if (scene.getObjectByName('UI')){
+            const curr = scene.getObjectByName('UI');
+            if (curr.visible){
                 deleteUI();
             } else {
-                makeMenuUI();
+                menuUIVisible();
             }    
         }
     }
