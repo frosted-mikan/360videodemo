@@ -1,8 +1,8 @@
 // use /script/VRButton.js for localhost
 // use /360videodemo/script/VRButton.js for github pages
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-import { VRButton } from '/script/VRButton.js';
-import VRControl from '/script/VRControl.js';
+import { VRButton } from '/360videodemo/script/VRButton.js';
+import VRControl from '/360videodemo/script/VRControl.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/DragControls.js';
 
@@ -124,13 +124,9 @@ function init() {
 
     dragControls.addEventListener('dragstart', function () {
         orbitControls.enabled = false;
-        // console.log('dragstart');
-        // console.log(dragObjs);
     });
     dragControls.addEventListener('dragend', function () {
         orbitControls.enabled = true;
-        // console.log('dragend');
-        // console.log(dragObjs);
     });
 
     //
@@ -165,31 +161,16 @@ function render() {
     updateButtons(); // for buttons 
 }
 
-// Hide visibility of all UI present 
-function deleteUI() {
-    let array = [];
-    scene.traverse(function(object) {
-        if (object.name == "UI" || object.name == "popUI"){
-            array.push(object);
-        }
-    });
-    array.forEach(function(object){
-        object.visible = false;
-    });
-}
-
 // Create Popup UI - called from makeMenuUI()
 function makePopupUI() {
-    // use /assets/Roboto-msdf.json for localhost
-    // use /360videodemo/assets/Roboto-msdf.json for git
     const container = new THREE.Group({
         height: 1.1,
         width: 2, 
         alignContent: 'right'
     }); //contains all popup UI
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -253,12 +234,10 @@ function makePopupUI() {
     exitContain.add(exit);
     objsToTest.push(exit);
 
-    container.visible = false;
-
     // Create actual popups
     const popupAttributes = {
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
@@ -292,8 +271,8 @@ function makePopupUI() {
     //Add exit to signin popup (deletePopupUI to parent obj)
     // Signup Exit button 
     const signExitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -327,8 +306,8 @@ function makePopupUI() {
 
     //Button on signin to submit 
     const submitBut = new ThreeMeshUI.Block({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -371,8 +350,8 @@ function makePopupUI() {
     
     //Button on Clips popup to signin
     const signinBut = new ThreeMeshUI.Block({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -431,6 +410,8 @@ function makePopupUI() {
     // Toggle visibility between popups
     popupsArr = [popTranscript, popDetails, popClips, popShare, popCite];
 
+    // Handle container visibility 
+    container.visible = false;
 }
 
 function deletePopupUI(obj) {
@@ -441,15 +422,13 @@ function deletePopupUI(obj) {
 
 // MENU BUTTONS UI -------------------------------------------------------------------
 function makeMenuUI() {
-    // use /assets/Roboto-msdf.json for localhost
-    // use /360videodemo/assets/Roboto-msdf.json for git
     const menuContain = new ThreeMeshUI.Block({
         height: 0.3,
         width: 2.3,
         justifyContent: 'center',
         contentDirection: 'row-reverse', //for buttons to be horizontal
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png'
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png'
     });
 
     menuContain.name = "UI";
@@ -574,14 +553,21 @@ function makeMenuUI() {
     buttonCite.setupState(idleStateAttributes);
 
     // Add all buttons to menu
+    buttonTranscript.name = 'test';
     menuContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
-    objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
-
-    menuContain.visible = false;
 
     const pop = scene.getObjectByName('popUI');
-    menuContain.add(pop);
+    menuContain.add(pop); // add popUI to menucontain to drag together
     dragObjs.push(menuContain);
+
+    objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
+    
+    // Handle visibility of UI, and add entire UI to objsToTest
+    menuContain.visible = false;
+    menuContain.children.forEach(function(obj){
+        obj.visible = false;
+    });
+    objsToTest.push(menuContain);
 
 }
 
@@ -596,40 +582,65 @@ function showPop(id) {
 	});
 };
 
+
+// Hide visibility of all UI present 
+function deleteUI() {
+    const curr = scene.getObjectByName('UI');
+    curr.visible = false;
+    curr.children.forEach(function(object){
+        object.visible = false;
+    });    
+}
+
+// Make menu bar visible 
 function menuUIVisible() {
     const curr = scene.getObjectByName('UI');
     curr.visible = true;
+    curr.children.forEach(function(object){
+        if (object.name != 'popUI') object.visible = true;
+    });
 }
 
 function updateButtons() {
     let intersect;
 
-    if (renderer.xr.isPresenting) {
+    if (renderer.xr.isPresenting) { // Entered VR
+        // console.log('XR is presenting');
+
         vrControl.setFromController(0, raycaster.ray);
         intersect = raycast();
 
-        if (intersect) vrControl.setPointerAt(0, intersect.point);
+        if (intersect && intersect.object.visible) {
+            // console.log('is intersect');
+            vrControl.setPointerAt(0, intersect.point);
+        }
 
-    } else if (mouse.x !== null && mouse.y !== null) {
+    } else if (mouse.x !== null && mouse.y !== null) { // Not entered VR
+        // console.log('No XR');
+
         raycaster.setFromCamera(mouse, camera);
         intersect = raycast();
     }
 
-    if (intersect && intersect.object.isUI) {
+    if (intersect && intersect.object.isUI && intersect.object.visible) {
+        // console.log('intersect && obj.isUI');
+
         if (selectState) {
             intersect.object.setState('selected');
         } else {
             intersect.object.setState('hovered');
         }
     } else {
+        // Have no intersect include not in UI
+        // include containers in objsToTest
+        // console.log('no visible intersect');
+        // console.log('selectstate:');
+        // console.log(selectState);
+
         // Call up/dismiss menu when area outside UI is clicked (2743)
         if (selectState) {
-            const curr = scene.getObjectByName('UI');
-            if (curr.visible){
-                deleteUI();
-            } else {
-                menuUIVisible();
-            }    
+            deleteUI();
+            menuUIVisible();
         }
     }
 

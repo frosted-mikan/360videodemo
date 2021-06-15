@@ -6,8 +6,6 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/webxr/XRControllerModelFactory.js';
 
-// import { XRControllerModelFactory } from '/script/XRControllerModelFactory.js';
-
 export default function VRControl( renderer, camera, scene ) {
 
 	const controllers = [];
