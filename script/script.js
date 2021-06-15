@@ -1,12 +1,14 @@
 // use /script/VRButton.js for localhost
 // use /360videodemo/script/VRButton.js for github pages
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-import { VRButton } from '/360videodemo/script/VRButton.js';
-import VRControl from '/360videodemo/script/VRControl.js';
+import { VRButton } from '/script/VRButton.js';
+import VRControl from '/script/VRControl.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/DragControls.js';
 
-let camera, scene, renderer, vrControl, controls;
-let objsToTest = [];
+let camera, scene, renderer, vrControl, orbitControls, dragControls;
+let objsToTest = []; //for buttons
+let dragObjs = []; //for dragging
 let popupsArr;
 
 
@@ -38,6 +40,7 @@ window.addEventListener('touchend', () => {
     mouse.y = null;
 });
 
+
 // UI disappears if idle for 10 seconds: mouse ver. 
 var timeout;
 document.onmousemove = function() {
@@ -50,16 +53,12 @@ document.onmousemove = function() {
     }, 10000);
 }
 
+
 init();
 animate();
 makeMenuUI(); 
 
 function init() {
-    const container = document.getElementById('container');
-    container.addEventListener('click', function() {
-        video.play();
-    });
-
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
     camera.layers.enable(1); // render left view when no stereo available
 
@@ -70,7 +69,6 @@ function init() {
     const texture = new THREE.VideoTexture(video);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x101010);
 
     // Left eye
     const geometry1 = new THREE.SphereGeometry(500, 60, 40);
@@ -116,9 +114,26 @@ function init() {
     container.appendChild(renderer.domElement);
 
     // Orbit controls for no VR
-    controls = new OrbitControls(camera, renderer.domElement);
+    orbitControls = new OrbitControls(camera, renderer.domElement);
     camera.position.set(0, 1.6, 0);
-    controls.target = new THREE.Vector3(0, 1, -1.8);
+    orbitControls.target = new THREE.Vector3(0, 1, -1.8);
+
+    // Drag controls
+    dragControls = new DragControls(dragObjs, camera, renderer.domElement);
+    dragControls.transformGroup = true;
+
+    dragControls.addEventListener('dragstart', function () {
+        orbitControls.enabled = false;
+        // console.log('dragstart');
+        // console.log(dragObjs);
+    });
+    dragControls.addEventListener('dragend', function () {
+        orbitControls.enabled = true;
+        // console.log('dragend');
+        // console.log(dragObjs);
+    });
+
+    //
 
     document.body.appendChild(VRButton.createButton(renderer));
 
@@ -145,7 +160,7 @@ function animate() {
 
 function render() {
     ThreeMeshUI.update();
-    controls.update(); // for OrbitControls
+    orbitControls.update(); // for OrbitControls
     renderer.render(scene, camera);
     updateButtons(); // for buttons 
 }
@@ -173,8 +188,8 @@ function makePopupUI() {
         alignContent: 'right'
     }); //contains all popup UI
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -182,8 +197,8 @@ function makePopupUI() {
         padding: 0.05
     });
     container.name = "popUI"; 
-    container.position.set(0, 1.63, -1.2);
-    container.rotation.x = -0.15;
+    container.position.set(0, 0.75, 0);
+    container.rotation.x = 0.15;
     container.add(exitContain);
     scene.add(container);
 
@@ -242,8 +257,8 @@ function makePopupUI() {
 
     // Create actual popups
     const popupAttributes = {
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
@@ -277,8 +292,8 @@ function makePopupUI() {
     //Add exit to signin popup (deletePopupUI to parent obj)
     // Signup Exit button 
     const signExitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -312,8 +327,8 @@ function makePopupUI() {
 
     //Button on signin to submit 
     const submitBut = new ThreeMeshUI.Block({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -356,8 +371,8 @@ function makePopupUI() {
     
     //Button on Clips popup to signin
     const signinBut = new ThreeMeshUI.Block({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -421,7 +436,6 @@ function makePopupUI() {
 function deletePopupUI(obj) {
     //obj: exit, obj.parent: exitContain, obj.parent.parent: container or popSign
     const curr = obj.parent.parent;
-    // const curr = scene.getObjectByName('popUI');
     curr.visible = false;
 }
 
@@ -434,8 +448,8 @@ function makeMenuUI() {
         width: 2.3,
         justifyContent: 'center',
         contentDirection: 'row-reverse', //for buttons to be horizontal
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png'
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png'
     });
 
     menuContain.name = "UI";
@@ -499,7 +513,7 @@ function makeMenuUI() {
         new ThreeMeshUI.Text({content: "Cite"})
     );
 
-    // Create all popups (all default hidden) in popupsArr
+    // Create all popups (all default hidden) 
     makePopupUI();
 
     // Create states for the buttons
@@ -564,6 +578,10 @@ function makeMenuUI() {
     objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
 
     menuContain.visible = false;
+
+    const pop = scene.getObjectByName('popUI');
+    menuContain.add(pop);
+    dragObjs.push(menuContain);
 
 }
 
