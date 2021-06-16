@@ -1,8 +1,8 @@
 // use /script/VRButton.js for localhost
 // use /360videodemo/script/VRButton.js for github pages
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-import { VRButton } from '/360videodemo/script/VRButton.js';
-import VRControl from '/360videodemo/script/VRControl.js';
+import { VRButton } from '/script/VRButton.js';
+import VRControl from '/script/VRControl.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/DragControls.js';
 
@@ -139,9 +139,41 @@ function init() {
 
     scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
 
-    vrControl.controllers[0].addEventListener('selectstart', () => {selectState = true});
-    vrControl.controllers[0].addEventListener('selectend', () => {selectState = false});
+    vrControl.controllers[0].addEventListener('selectstart', onSelectStart);
+    vrControl.controllers[0].addEventListener('selectend', onSelectEnd);
+
 }
+
+function onSelectStart(event) {
+    selectState = true;
+    const controller = event.target;
+    const intersection = raycast();
+
+    if (intersection && intersection.object.visible && controller.userData.selected == undefined) {
+        if (intersection.object.name == 'UI' || intersection.object.name == 'popUI'){
+            const object = intersection.object;
+            controller.attach(object);
+            controller.userData.selected = object;   
+        } 
+    }
+}
+
+function onSelectEnd(event) {
+    selectState = false; 
+    const controller = event.target;
+    if (controller.userData.selected !== undefined) {
+        const object = controller.userData.selected;
+
+        if (object.name == 'UI'){
+            scene.attach(object);
+        }else if (object.name == 'popUI'){
+            const curr = scene.getObjectByName('UI');
+            curr.attach(object);
+        }
+        controller.userData.selected = undefined;
+    }
+}
+
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -165,12 +197,12 @@ function render() {
 function makePopupUI() {
     const container = new THREE.Group({
         height: 1.1,
-        width: 2, 
+        width: 1, 
         alignContent: 'right'
     }); //contains all popup UI
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -236,8 +268,8 @@ function makePopupUI() {
 
     // Create actual popups
     const popupAttributes = {
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
@@ -250,6 +282,7 @@ function makePopupUI() {
     const popTranscript = new ThreeMeshUI.Block(popupAttributes);
     const popDetails = new ThreeMeshUI.Block(popupAttributes);
     const popClips = new ThreeMeshUI.Block(popupAttributes);
+    popClips.name = 'clips';
     const popShare = new ThreeMeshUI.Block(popupAttributes);
     const popCite = new ThreeMeshUI.Block(popupAttributes);
 
@@ -271,8 +304,8 @@ function makePopupUI() {
     //Add exit to signin popup (deletePopupUI to parent obj)
     // Signup Exit button 
     const signExitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -306,8 +339,8 @@ function makePopupUI() {
 
     //Button on signin to submit 
     const submitBut = new ThreeMeshUI.Block({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -324,19 +357,18 @@ function makePopupUI() {
         state: "selected",
         attributes:selectedAttributes,
         onSet: () => {
-            //make signin popup disappear
-            popSign.visible = false;
-            //Update clips popup
-            //delete existing children of popClips
-            for (var i = popClips.children.length - 1; i >= 0; i--) {
-                popClips.remove(popClips.children[i]);
-            }
+            //delete existing children of popClips (including popSign)
+            popClips.remove(popSign);
+            const signin = scene.getObjectByName('signin');
+            const text = scene.getObjectByName('clipstext');
+            popClips.remove(signin, text);
+
             //add new clip static text
             popClips.add(
                 new ThreeMeshUI.Text({
                     content: 'Clips\n------ \n\n 0:00:00 A new clip here'
                 })
-            );        
+            );    
         }
     });
     submitBut.setupState(hoveredStateAttributes);
@@ -344,14 +376,14 @@ function makePopupUI() {
     objsToTest.push(submitBut);
     popSign.add(submitBut);
 
-    //Add signin popup to container
+    //Add signin popup to clips popup
     popSign.visible = false;
-    container.add(popSign);
+    popClips.add(popSign); 
     
     //Button on Clips popup to signin
     const signinBut = new ThreeMeshUI.Block({
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -375,6 +407,7 @@ function makePopupUI() {
     });
     signinBut.setupState(hoveredStateAttributes);
     signinBut.setupState(idleStateAttributes);
+    signinBut.name = 'signin';
     objsToTest.push(signinBut);
     popClips.add(signinBut);
     
@@ -388,11 +421,11 @@ function makePopupUI() {
             content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017'
         })
     );
-    popClips.add(
-        new ThreeMeshUI.Text({
-            content: 'Clips\n------ \n\nNo Clips Found'
-        }),
-    );
+    const clipsText = new ThreeMeshUI.Text({
+        content: 'Clips\n------ \n\nNo Clips Found'
+    });
+    clipsText.name = 'clipstext';
+    popClips.add(clipsText);
     popShare.add(
         new ThreeMeshUI.Text({
             content: 'Hello Robot\n\nDirected by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot'
@@ -427,8 +460,8 @@ function makeMenuUI() {
         width: 2.3,
         justifyContent: 'center',
         contentDirection: 'row-reverse', //for buttons to be horizontal
-        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
-        fontTexture: '/360videodemo/assets/Roboto-msdf.png'
+        fontFamily: '/assets/Roboto-msdf.json',
+        fontTexture: '/assets/Roboto-msdf.png'
     });
 
     menuContain.name = "UI";
@@ -605,38 +638,28 @@ function updateButtons() {
     let intersect;
 
     if (renderer.xr.isPresenting) { // Entered VR
-        // console.log('XR is presenting');
-
         vrControl.setFromController(0, raycaster.ray);
         intersect = raycast();
 
-        if (intersect && intersect.object.visible) {
-            // console.log('is intersect');
+        if (intersect) {
             vrControl.setPointerAt(0, intersect.point);
         }
 
     } else if (mouse.x !== null && mouse.y !== null) { // Not entered VR
-        // console.log('No XR');
-
         raycaster.setFromCamera(mouse, camera);
         intersect = raycast();
     }
 
     if (intersect && intersect.object.isUI && intersect.object.visible) {
-        // console.log('intersect && obj.isUI');
-
         if (selectState) {
+            if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible))
             intersect.object.setState('selected');
         } else {
             intersect.object.setState('hovered');
         }
     } else {
-        // Have no intersect include not in UI
-        // include containers in objsToTest
-        // console.log('no visible intersect');
-        // console.log('selectstate:');
-        // console.log(selectState);
 
+        // TODO: main menu doesn't disappear on click 
         // Call up/dismiss menu when area outside UI is clicked (2743)
         if (selectState) {
             deleteUI();
