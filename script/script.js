@@ -1,8 +1,8 @@
 // use /script/VRButton.js for localhost
 // use /360videodemo/script/VRButton.js for github pages
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-import { VRButton } from '/script/VRButton.js';
-import VRControl from '/script/VRControl.js';
+import { VRButton } from '/360videodemo/script/VRButton.js';
+import VRControl from '/360videodemo/script/VRControl.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/DragControls.js';
 
@@ -201,8 +201,8 @@ function makePopupUI() {
         alignContent: 'right'
     }); //contains all popup UI
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -268,8 +268,8 @@ function makePopupUI() {
 
     // Create actual popups
     const popupAttributes = {
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         height: 1.1,
         width: 1,
         alignContent: 'left', 
@@ -304,8 +304,8 @@ function makePopupUI() {
     //Add exit to signin popup (deletePopupUI to parent obj)
     // Signup Exit button 
     const signExitContain = new ThreeMeshUI.Block({ //contains exit button
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'right',
         justifyContent: 'start',
         height: 1.1,
@@ -339,8 +339,8 @@ function makePopupUI() {
 
     //Button on signin to submit 
     const submitBut = new ThreeMeshUI.Block({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -382,8 +382,8 @@ function makePopupUI() {
     
     //Button on Clips popup to signin
     const signinBut = new ThreeMeshUI.Block({
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png',
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png',
         alignContent: 'center',
         justifyContent: 'center',
         height: 0.1, 
@@ -460,8 +460,8 @@ function makeMenuUI() {
         width: 2.3,
         justifyContent: 'center',
         contentDirection: 'row-reverse', //for buttons to be horizontal
-        fontFamily: '/assets/Roboto-msdf.json',
-        fontTexture: '/assets/Roboto-msdf.png'
+        fontFamily: '/360videodemo/assets/Roboto-msdf.json',
+        fontTexture: '/360videodemo/assets/Roboto-msdf.png'
     });
 
     menuContain.name = "UI";
