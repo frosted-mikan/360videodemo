@@ -9,7 +9,7 @@ import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm
 let camera, scene, renderer, vrControl, orbitControls, dragControls;
 let objsToTest = []; //for buttons
 let dragObjs = []; //for dragging
-let popupsArr;
+let popupsArr; //toggle between the popups
 
 
 const raycaster = new THREE.Raycaster();
@@ -141,6 +141,8 @@ function init() {
 
     vrControl.controllers[0].addEventListener('selectstart', onSelectStart);
     vrControl.controllers[0].addEventListener('selectend', onSelectEnd);
+
+    scene.add(camera);
 
 }
 
@@ -456,16 +458,15 @@ function deletePopupUI(obj) {
 // MENU BUTTONS UI -------------------------------------------------------------------
 function makeMenuUI() {
     const menuContain = new ThreeMeshUI.Block({
-        height: 0.3,
+        height: 0.45, //0.3
         width: 2.3,
         justifyContent: 'center',
-        contentDirection: 'row-reverse', //for buttons to be horizontal
+        // contentDirection: 'row-reverse', //for buttons to be horizontal
         fontFamily: '/360videodemo/assets/Roboto-msdf.json',
         fontTexture: '/360videodemo/assets/Roboto-msdf.png'
     });
 
     menuContain.name = "UI";
-    menuContain.position.set(0, 0.88, -1);
     menuContain.rotation.x = -0.55;
     scene.add(menuContain);
 
@@ -585,15 +586,109 @@ function makeMenuUI() {
     buttonCite.setupState(hoveredStateAttributes);
     buttonCite.setupState(idleStateAttributes);
 
-    // Add all buttons to menu
-    buttonTranscript.name = 'test';
-    menuContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
 
+    // Add all buttons to button menu 
+    const buttonContain = new ThreeMeshUI.Block({
+        height: 0.3, 
+        width: 2.3,
+        justifyContent: 'center',
+        contentDirection: 'row-reverse' //for buttons to be horizontal
+    });
+    buttonContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
+    objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
+    menuContain.add(buttonContain);
+
+
+    // Create video controls: play/pause, rewind and fastforward 
+    // container for all video controls
+    const controlsContain = new ThreeMeshUI.Block({
+        height: 0.15,
+        width: 2, 
+        justifyContent:'center',
+        contentDirection: 'row-reverse'
+    });
+    menuContain.add(controlsContain);
+    // Play/pause button
+    const playpause = new ThreeMeshUI.Block({
+        height: 0.15,
+        width: 0.15,
+        justifyContent: 'start',
+        alignContent: 'center'
+    });
+    const play = new THREE.TextureLoader().load('/360videodemo/assets/play.png');
+    const pause = new THREE.TextureLoader().load('/360videodemo/assets/pause.png');
+    playpause.set({backgroundTexture: pause});
+    let trigger = true; //video starts playing automatically
+    const video = document.getElementById('video');
+    playpause.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: () => {
+            if (trigger){
+                playpause.set({backgroundTexture: play});
+                video.pause();
+                trigger = false;
+            }else {
+                playpause.set({backgroundTexture: pause});
+                video.play();
+                trigger = true;
+            }
+        }
+    });
+    playpause.setupState(hoveredStateAttributes);
+    playpause.setupState(idleStateAttributes);
+    controlsContain.add(playpause);
+    objsToTest.push(playpause);
+
+    // Fastfoward button
+    const fastForward = new ThreeMeshUI.Block({
+        height: 0.15,
+        width: 0.15,
+        justifyContent: 'start',
+        alignContent: 'center'
+    });
+    const forward = new THREE.TextureLoader().load('/360videodemo/assets/fastforward.png');
+    fastForward.set({backgroundTexture: forward});
+    fastForward.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: () => {
+            video.currentTime = video.duration;
+        }
+    });
+    fastForward.setupState(hoveredStateAttributes);
+    fastForward.setupState(idleStateAttributes);
+
+    // Rewind button
+    const rewind = new ThreeMeshUI.Block({
+        height: 0.15,
+        width: 0.15,
+        justifyContent: 'start',
+        alignContent: 'center'
+    });
+    const rewindIcon = new THREE.TextureLoader().load('/360videodemo/assets/rewind.png');
+    rewind.set({backgroundTexture: rewindIcon});
+    rewind.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: () => {
+            video.currentTime = 0;
+        }
+    });
+    rewind.setupState(hoveredStateAttributes);
+    rewind.setupState(idleStateAttributes);
+    
+
+    // Add all video controls to container 
+    controlsContain.add(fastForward, playpause, rewind);
+    objsToTest.push(fastForward, playpause, rewind);
+
+
+    // Add popups to menuContain
     const pop = scene.getObjectByName('popUI');
     menuContain.add(pop); // add popUI to menucontain to drag together
     dragObjs.push(menuContain);
 
-    objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
     
     // Handle visibility of UI, and add entire UI to objsToTest
     menuContain.visible = false;
@@ -602,6 +697,11 @@ function makeMenuUI() {
     });
     objsToTest.push(menuContain);
 
+
+    // 2745: Add entire menu as child of camera so it stays fixed in space
+    camera.add(menuContain); 
+    // menuContain.position.set(0, 0.88, -1); //for dev
+    menuContain.position.set(0, 0, -1.5) 
 }
 
 // Make the chosen popup visible, hide all others
