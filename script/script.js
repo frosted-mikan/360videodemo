@@ -53,10 +53,20 @@ document.onmousemove = function() {
     }, 10000);
 }
 
+// Enter VR mode on fullscreen
+const video = document.getElementById('video');
+function openFullscreen() {
+    video.style.display = 'none';
+    init();
+    animate();
+    makeMenuUI();
+}
+document.querySelector('button').addEventListener('click', openFullscreen);
 
-init();
-animate();
-makeMenuUI(); 
+    
+// init();
+// animate();
+// makeMenuUI(); 
 
 function init() {
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
@@ -108,9 +118,12 @@ function init() {
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
+    // renderer.setSize(840, 304); //HERE
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
     renderer.xr.setReferenceSpaceType('local');
+
+    // const container = document.getElementById('container'); //??
     container.appendChild(renderer.domElement);
 
     // Orbit controls for no VR
@@ -212,8 +225,8 @@ function makePopupUI() {
         padding: 0.05
     });
     container.name = "popUI"; 
-    container.position.set(0, 0.75, 0);
-    container.rotation.x = 0.15;
+    container.position.set(0, 0.85, 0);
+    container.rotation.x = 0.25;
     container.add(exitContain);
     scene.add(container);
 
@@ -699,9 +712,9 @@ function makeMenuUI() {
 
 
     // 2745: Add entire menu as child of camera so it stays fixed in space
-    camera.add(menuContain); 
-    // menuContain.position.set(0, 0.88, -1); //for dev
-    menuContain.position.set(0, 0, -1.5) 
+    // camera.add(menuContain); 
+    // menuContain.position.set(0, 0, -1.5) 
+    menuContain.position.set(0, 0.88, -1); //for dev
 }
 
 // Make the chosen popup visible, hide all others

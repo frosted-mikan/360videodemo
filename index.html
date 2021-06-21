@@ -1,16 +1,133 @@
 <!DOCTYPE html>
 <head>
-  <title>360 Video Demo</title>
-  <script src='https://unpkg.com/three-mesh-ui'></script>
+    <meta http-equiv="content-type" content="text/html">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>360 Video Demo</title>
+    <!-- Bootstrap Core CSS ––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!-- Custom CSS ––––––––––––––––––––––––––– -->
+    <link href="style.css" rel="stylesheet">
+    <!-- three-mesh-ui -------------------- -->
+    <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
 
 <body>
-  <div id="container"></div>
+    <!-- Container for VR  --------------------------------------->
+    <div id="container"></div>
+    <!-- Main website -------------------------------------------->
+    <div>
+        <!-- Top Accessbar  -------------------------->
+        <div class="row accessbar">
+            <div class="col-sm-4 col1">
+                <img src="assets/as_logo.png" alt="AS logo">
+            </div>
+            <div class="col-sm-4 col2">
+                <p>Access Provided By</p>
+                <h2>PHAROS TREEHOUSE (INTERNAL)</h2>
+            </div>
+            <div class="col-sm-4 col3">
+                <p>Need help? Ask a librarian.</p>
+            </div>
+        </div>
+    
+        <!-- Menu Bar -------------------------------->
+        <div class="row menubar">
+            <!-- Hamburger + AS logo-->
+            <div class="col-sm-4 menubar_col1">
+                <img src="assets/as_menulogo.png" alt="AS menu logo">
+            </div>
+            <!-- All Menu Options -->
+            <div class="row col-sm-6 menu_options">
+                <!-- Fullscreen -->
+                <div class="option">
+                    <h1>Fullscreen</h1>
+                </div>
+                <!-- Transcript -->
+                <div class="option">
+                    <h1>Transcript</h1>
+                </div>
+                <!-- Details  -->
+                <div class="details">
+                    <h1>Details</h1>
+                </div>
+                <!-- Clips -->
+                <div class="option">
+                    <h1>Clips</h1>
+                </div>
+                <!-- Share -->
+                <div class="option">
+                    <h1>Share</h1>
+                </div>
+                <!-- Cite -->
+                <div class="option">
+                    <h1>Cite</h1>
+                </div>
+            </div>
+            <!-- Searchbar and Profile -->
+            <div class="col-sm-2 search">
+                <img src="assets/search_profile.png" alt="search profile">
+            </div>
+        </div>
 
-  <video id="video" muted crossOrigin="anonymous" playsinline style="display:none">
-  <!-- <video id="video" playsinline controls style="display:none"> -->
-    <source src="360small.mp4" type="video/mp4">
-  </video>  
-  <script type="module" src="script/script.js"></script>
+        <!-- Main Video Portion ------------------------------->
+        <div class="row mainvideo">
+            <!-- Video itself -->
+            <div class="col-sm-9 videodiv">
+                <video id="video" muted crossOrigin="anonymous" playsinline >
+                    <source src="360small.mp4" type="video/mp4">
+                </video>     
+                <button><img src="assets/play.png"></button> 
+            </div>
+            <!-- Details column -->
+            <div class="col-sm-3 det_expand">
+                <h1 class="underline">Details</h1>
+                <h4>Abstract</h4>
+                <p>Go face-to-face with the world's most advanced robots and get a rare look inside Boston Dynamics' top secret lab, never before open to the public...until now.</p>
+                <h4>Release Date</h4>
+                <p>2017</p>
+                <h4>Producer</h4>
+                <p>Ari Palitz</p>
+            </div>
+        </div>
 
+        <!-- Bottom Video Player ----------------------------->
+        <div class="scrubber"></div>
+        <div class="row bottom_ctrl">
+            <!-- Title of video  -->
+            <div class="col-sm-5 video_title">
+                <h3>Hello, Robot</h3>
+                <h5>0:00 / 11.16</h5>
+            </div>
+            <!-- Video controls -->
+            <div class="row col-sm-2">
+                <div class="col-sm-4 vid_ctrl">
+                    <img src="assets/rewind.png" alt="rewind">
+                </div>
+                <div class='col-sm-4 vid_ctrl'>
+                    <img src="assets/play.png" alt="play">
+                </div>
+                <div class='col-sm-4 vid_ctrl'>
+                    <img src="assets/fastforward.png" alt="fastfoward">
+                </div>
+            </div>
+            <!-- Video info -->
+            <div class="col-sm-5 info">
+                <p>Directed by <strong>David Gelb</strong>, With <strong>Marc Raibert</strong>, 
+                    Produced by <strong>Ari Palitz</strong>, In <strong>The Possible</strong> 
+                    (Los Angeles, CA: <strong>Within</strong>, 2017), 11 minutes</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap core js -------------------->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    <!-- Main js for VR ----------------------->
+    <script type="module" src="script/script.js"></script> 
 </body>

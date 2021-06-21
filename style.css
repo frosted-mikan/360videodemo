@@ -1,0 +1,226 @@
+@font-face {
+    font-family: 'AvenirNext';
+    src: url('/assets/AvenirNextLTPro-Regular.woff2') format('woff2'),
+        url('/assets/AvenirNextLTPro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* Access Bar ----------------------------------------------------------- */
+.accessbar {
+    background-color: white;
+    overflow: hidden;
+    top: 0; /* Position at the top of the page */
+    width: 100%; /* Full width */
+    height: 50px;
+    text-align:center;
+    font-family: 'AvenirNext';
+    margin-left: 0;
+}
+.accessbar img {
+    height: 43px;
+}
+.col1 {
+    margin: auto;
+    padding-right: 320px;
+}
+.col2 {
+    color: #767676;
+    margin: auto;
+}
+.col2 p {
+    font-size: 11px;
+    margin: 0;
+}
+.col2 h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+.col3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3b73af;
+    margin: auto;
+    padding-left: 200px;
+}
+.col3 p {
+    margin: auto;
+}
+
+/* Menu Bar ----------------------------------------------------------- */
+.menubar {
+    background-color: #121212;
+    width: 100%; /* Full width */
+    height: 100px;
+    text-align:center;
+    font-family: 'AvenirNext';
+    margin: 0;
+}
+h1 {
+    color: white;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+.menu_options {
+    padding-left: 0;
+}
+.option {
+    margin-left: 0.7em;
+    margin-right: 0.7em;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.details h1:after {
+    position: absolute;
+    top: 70px;
+    left: 12.9em;
+    width: 20px;
+    height: 5px;
+    content: " ";
+    background: white;
+}
+.details {
+    background-color: rgba(199,37,8,.75);
+    width: 90px;
+    height: 100px;
+    padding-top: 38.5px;
+}
+.menubar_col1 {
+    background-color: black;
+    width: 430px;
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    left: -3em;
+}
+.menubar_col1 img{
+    height: 65px;
+    margin-top: 1em;
+    margin-left: 1em;
+}
+.search {
+    margin: auto;
+    left: -3em;
+}
+.search img {
+    height: 47px;
+}
+
+/* Main Video Portion ------------------------------- */
+.mainvideo {
+    background-color: #333333;
+    width: 100%;
+    height: 350px;
+    text-align: center;
+    font-family: 'AvenirNext';
+    margin: 0;
+}
+video {
+    background-color: black;
+    height: 304px;
+    width: 840px;
+    position: absolute;
+    bottom: 1.5em;
+    right: 5em;
+}
+.videodiv button {
+    position: relative;
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    top: 7em;
+    right: 1em;
+}
+.videodiv img {
+    opacity: 80%;
+    height: 100px;
+    transition: 0.2s;
+}
+button img:hover {
+    opacity: 100%;
+    transform: scale(1.05);
+}
+
+h4 {
+    font-size: 15.2px;
+    margin-bottom: 5px;
+    color: white;
+    font-weight: 700;
+}
+.det_expand p {
+    font-size: 14.4px;
+    color: #DDDDDD;
+}
+.det_expand {
+    text-align: left;
+    height: 350px;
+    left: -3em;
+    padding-top: 1.5em;
+}
+.det_expand h1 {
+    margin-bottom: 1.5em;
+}
+.underline:after {
+    position: absolute;
+    top: 55px;
+    left: 0.7em;
+    width: 20px;
+    height: 7px;
+    content: " ";
+    background: #b4321b;
+}
+
+/* Bottom Video Controls ------------------------------- */
+.scrubber {
+    width: 100%;
+    height: 8px;
+    background-color: #909090;
+}
+.bottom_ctrl {
+    background-color: black;
+    width: 100%;
+    height: 180px;
+    margin-left: 0;
+}
+.video_title {
+    margin-left: 30px;
+    margin-top: 30px;
+}
+.video_title h3 {
+    font-size: 22.4px;
+    color: white;
+}
+h5 {
+    font-size: 16px;
+    color:white;
+}
+.vid_ctrl {
+    margin-top: 2em;
+    left: -1em;
+}
+.vid_ctrl img{
+    height: 40px;
+}
+.info {
+    margin-top: 2em;
+    padding-left: 3em;
+    padding-right: 3em;
+}
+.info p {
+    color: white;
+    font-size: 13.6px;
+}
