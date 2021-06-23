@@ -15,13 +15,20 @@ html, body {
     overflow-y: hidden;
 }
 
+.main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 /* Access Bar ----------------------------------------------------------- */
 .accessbar {
     background-color: white;
     overflow: hidden;
     top: 0; /* Position at the top of the page */
     width: 100%; /* Full width */
-    height: 50px;
+    /* height: 50px; */
+    height: 16%;
     text-align:center;
     font-family: 'AvenirNext';
     margin-left: 0;
@@ -61,7 +68,8 @@ html, body {
 .menubar {
     background-color: #121212;
     width: 100%; /* Full width */
-    height: 100px;
+    /* height: 100px; */
+    height: 33.33%;
     text-align:center;
     font-family: 'AvenirNext';
     margin: 0;
@@ -121,7 +129,8 @@ h1 {
 .mainvideo {
     background-color: #333333;
     width: 100%;
-    height: 350px;
+    /* height: 350px; */
+    height: 100%;
     text-align: center;
     font-family: 'AvenirNext';
     margin: 0;
@@ -187,13 +196,14 @@ h4 {
 /* Bottom Video Controls ------------------------------- */
 .scrubber {
     width: 100%;
-    height: 8px;
+    height: 15px;
     background-color: #909090;
 }
 .bottom_ctrl {
     background-color: black;
     width: 100%;
-    height: 180px;
+    height: 40%;
+    /* height: 180px; */
     margin-left: 0;
 }
 .video_title {
