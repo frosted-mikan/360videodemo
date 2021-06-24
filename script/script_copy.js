@@ -589,8 +589,13 @@ function showUnder(id) {
 function makeMenuUI() {
     // Group which contains all menu UI
     const menuContain = new THREE.Group(); 
+    // const menuContain = new ThreeMeshUI.Block({
+    //     height: 1,
+    //     width: 1
+    // });
     menuContain.name = "UI";
     scene.add(menuContain);
+    // menuContain.position.set(0, 0, -1.5) 
 
     // BUTTONS
     const buttonOptions = {
@@ -719,7 +724,9 @@ function makeMenuUI() {
         justifyContent: 'center',
         contentDirection: 'row-reverse' //for buttons to be horizontal
     });
-    buttonContain.position.set(0, 1, -1); //set position of main menu //use z=-1? 
+    // buttonContain.position.set(0, 1, -1); //set position of main menu //use z=-1? 
+    buttonContain.position.set(0, 0, -1.5) 
+    buttonContain.rotation.x = -0.55;
     // buttonContain.position.set(0, 1.5, 1); //TESTING
     buttonContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
     objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
