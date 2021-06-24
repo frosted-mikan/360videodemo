@@ -64,6 +64,7 @@ function openFullscreen() {
     animate();
     makeMenuUI();
 }
+// TESTING UI
 // document.querySelector('button').addEventListener('click', openFullscreen);
 
 // Load the fonts 
@@ -73,6 +74,8 @@ var font_json = "/360videodemo/assets/AvenirNextLTPro-Regular-msdf.json";
 var font_png = "/360videodemo/assets/AvenirNextLTPro-Regular.png";
 
 openFullscreen(); // TESTING
+
+
 
 function init() {
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
@@ -123,6 +126,7 @@ function init() {
     scene.add(mesh2);
 
     renderer = new THREE.WebGLRenderer();
+    renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
@@ -217,7 +221,8 @@ function makePopupUI() {
     const container = new THREE.Group({ //contains all popup UI
         height: 0.8,
         width: 1.8, 
-        alignContent: 'right'
+        alignContent: 'right',
+        hiddenOverflow: true // container must be a Block
     }); 
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
         fontFamily: font_json_bold, 
@@ -238,10 +243,8 @@ function makePopupUI() {
     const hoveredStateAttributes = {
         state: "hovered",
         attributes: {
-            // offset: 0.035,
             backgroundColor: new THREE.Color(0xd24f39),
             backgroundOpacity: 1
-            // fontColor: new THREE.Color(0xffffff)
         },
     };
 
@@ -250,10 +253,6 @@ function makePopupUI() {
         attributes: {
             backgroundOpacity: 1,
             backgroundColor: new THREE.Color(0x000000)
-            // offset: 0.035,
-            // backgroundColor: new THREE.Color(0x666666),
-            // backgroundOpacity: 0.3,
-            // fontColor: new THREE.Color(0xffffff)
         },
     };
 
@@ -432,7 +431,22 @@ function makePopupUI() {
     // signinBut.name = 'signin';
     // objsToTest.push(signinBut);
     // popClips.add(signinBut);
-    
+
+    // Red underline 
+    const box = new THREE.PlaneGeometry(0.06, 0.02);
+    const material = new THREE.MeshBasicMaterial({color: 0xd24f39});
+    const plane = new THREE.Mesh(box, material);
+    plane.position.set(-0.75, 0.23, 0.03);
+    plane.visible = true;
+    container.add(plane); 
+
+    // Transcript Text
+    const tranText = new ThreeMeshUI.Text({
+        content: '0:00:00 TRANSCRIPT OF VIDEO FILE:\n\n0:00:50 UNKNOWN: The dream is building machines that can go anywhere a person or animal can go, thats how I see the future',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
     popTranscript.add(
         new ThreeMeshUI.Text({
             content: 'Transcript\n',
@@ -440,34 +454,101 @@ function makePopupUI() {
             fontTexture: font_png_bold,
             fontSize: 0.055
         }), 
-        new ThreeMeshUI.Text({
-            content: '0:00:00 TRANSCRIPT OF VIDEO FILE:\n\n0:00:50 UNKNOWN: The dream is building machines that can go anywhere a person or animal can go, thats how I see the future',
-            fontFamily: font_json,
-            fontTexture: font_png,
-            fontSize: 0.04
-        })
+        tranText
     );
+    tranText.position.set(0, -0.05, 0);
+
+    // Details Text
+    const detText1 = new ThreeMeshUI.Text({
+        content: 'Abstract \n',
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontSize: 0.045
+    });
+    const detText2 = new ThreeMeshUI.Text({
+        content: 'Go face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
+    const detText3 = new ThreeMeshUI.Text({
+        content: 'Release Date\n',
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontSize: 0.045
+    });
+    const detText4 = new ThreeMeshUI.Text({
+        content: '2017\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    })
     popDetails.add(
         new ThreeMeshUI.Text({
-            content: 'Details\n------ \nAbstract \nGo face-to-face with the worlds most advanced robots and get a rare look inside Boston Dynamics top secret lab, never before open to the public...until now.\n\nRelease Date\n2017'
-        })
+            content: 'Details\n',
+            fontFamily: font_json_bold,
+            fontTexture: font_png_bold,
+            fontSize: 0.055
+        }),
+        detText1, detText2, detText3, detText4
     );
+    detText1.position.set(0, -0.05, 0);
+    detText2.position.set(0, -0.055, 0);
+    detText3.position.set(0, -0.1, 0);
+    detText4.position.set(0, -0.105, 0);
+
+    // Clips Text
+    const clipsText1 = new ThreeMeshUI.Text({
+        content: 'No Clips Found\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    })
     const clipsText = new ThreeMeshUI.Text({
-        content: 'Clips\n------ \n\nNo Clips Found'
+        content: 'Clips\n',
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontSize: 0.055
     });
     clipsText.name = 'clipstext';
-    popClips.add(clipsText);
+    popClips.add(clipsText, clipsText1);
+    clipsText1.position.set(0, -0.05, 0);
+
+    // Share Text 
+    const shareText1 = new ThreeMeshUI.Text({
+        content: 'Directed by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
     popShare.add(
         new ThreeMeshUI.Text({
-            content: 'Hello Robot\n\nDirected by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot'
-        })
+            content: 'Hello Robot\n',
+            fontFamily: font_json_bold,
+            fontTexture: font_png_bold,
+            fontSize: 0.055    
+        }), shareText1
     );
+    shareText1.position.set(0, -0.05, 0);
+
+    // Cite Text
+    const citeText1 = new ThreeMeshUI.Text({
+        content: 'MLA8\n\n"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
     popCite.add(
         new ThreeMeshUI.Text({
-            content: 'Choose a citation style\n------ \nMLA8\n\n"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.'
-        })
+            content: 'Choose a citation style\n',
+            fontFamily: font_json_bold,
+            fontTexture: font_png_bold,
+            fontSize: 0.055    
+        }), citeText1
     );
-        
+    citeText1.position.set(0, -0.05, 0);
+    
+    // Add all popups to container
     popTranscript.visible = popDetails.visible = popClips.visible = popShare.visible = popCite.visible = false;
     container.add(popTranscript, popDetails, popClips, popShare, popCite);
     
@@ -506,7 +587,8 @@ function showUnder(id) {
 
 // MENU BUTTONS UI -------------------------------------------------------------------
 function makeMenuUI() {
-    const menuContain = new THREE.Group(); // Group which contains all menu UI
+    // Group which contains all menu UI
+    const menuContain = new THREE.Group(); 
     menuContain.name = "UI";
     scene.add(menuContain);
 
@@ -637,7 +719,8 @@ function makeMenuUI() {
         justifyContent: 'center',
         contentDirection: 'row-reverse' //for buttons to be horizontal
     });
-    buttonContain.position.set(0, 1.5, 1); //set position of main menu
+    buttonContain.position.set(0, 1, -1); //set position of main menu //use z=-1? 
+    // buttonContain.position.set(0, 1.5, 1); //TESTING
     buttonContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
     objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
     menuContain.add(buttonContain);
