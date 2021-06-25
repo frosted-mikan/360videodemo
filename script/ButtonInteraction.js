@@ -4,7 +4,7 @@
 
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { camera, scene, objsToTest, renderer, mouse, vrControl, selectState } from '/360videodemo/script/script.js';
-import { menuUIVisible, deleteUI } from '/360videodemo/script/MenuCreation.js';
+import { menuUIVisible, deleteUI } from '/360videodemo/script/MenuHelpers.js';
 
 
 let curr; // keep track of current object selected
@@ -31,7 +31,7 @@ function updateButtons() {
         if (selectState) {
             if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible)) {
                 intersect.object.setState('selected');
-                if (intersect.object.name != 'vidcontrols'){
+                if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin'){
                     curr = intersect.object;
                 }
             }
@@ -45,6 +45,7 @@ function updateButtons() {
         if (selectState) {
             deleteUI();
             menuUIVisible();
+            curr = null;
         }
     }
 

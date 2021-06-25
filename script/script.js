@@ -8,7 +8,8 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/js
 import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/DragControls.js';
 import { VRButton } from '/360videodemo/script/VRButton.js';
 import VRControl from '/360videodemo/script/VRControl.js';
-import { makeMenuUI, deleteUI } from '/360videodemo/script/MenuCreation.js';
+import { makeMenuUI } from '/360videodemo/script/MenuCreation.js';
+import { deleteUI } from '/360videodemo/script/MenuHelpers.js';
 import { updateButtons, raycast } from '/360videodemo/script/ButtonInteraction.js';
 
 
@@ -67,9 +68,7 @@ function openFullscreen() {
 }
 // TESTING
 // document.querySelector('button').addEventListener('click', openFullscreen);
-
-openFullscreen(); // TESTING
-
+openFullscreen(); 
 
 
 function init() {
@@ -77,7 +76,6 @@ function init() {
     camera.layers.enable(1); // render left view when no stereo available
 
     // Video
-    const video = document.getElementById('video');
     video.play();
 
     const texture = new THREE.VideoTexture(video);
@@ -121,7 +119,7 @@ function init() {
     scene.add(mesh2);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
+    // renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;

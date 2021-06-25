@@ -2,8 +2,9 @@
     Creates and maintains menu/popups/video controls
 */
 
-import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
+import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
+import { deletePopupUI, makeUnderlines, showUnder, showPop, makeVideoControls } from '/360videodemo/script/MenuHelpers.js';
 
 
 let popupsArr; //toggle between the popups
@@ -21,8 +22,8 @@ function makePopupUI() {
     const container = new THREE.Group({ //contains all popup UI
         height: 0.8,
         width: 1.8, 
-        alignContent: 'right',
-        hiddenOverflow: true // container must be a Block
+        alignContent: 'right'
+        // hiddenOverflow: true // container must be a Block
     }); 
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
         fontFamily: font_json_bold, 
@@ -34,8 +35,7 @@ function makePopupUI() {
         padding: 0.05
     });
     container.name = "popUI"; 
-    container.position.set(0, 1, 1);
-    // container.rotation.x = 0.25;
+    container.position.set(0, 0.5, -0.3);
     container.add(exitContain);
     scene.add(container);
 
@@ -77,7 +77,7 @@ function makePopupUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
-            deletePopupUI(exit);
+            deletePopupUI(exit, 'exit');
         }
     });
     exit.setupState(hoveredStateAttributes);
@@ -113,124 +113,173 @@ function makePopupUI() {
     popShare.position.set(0, 0.005, 0);
     popCite.position.set(0, 0.005, 0);
 
-    // //Signin popup block
-    // const popSign = new ThreeMeshUI.Block(popupAttributes);
-    // popSign.add(
-    //     new ThreeMeshUI.Text({
-    //         content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
-    //     })
-    // );
-    // popSign.position.set(1.1, 0.005, 0); //move to right
+    //Signin popup block
+    const popSign = new ThreeMeshUI.Block({
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        height: 0.3,
+        width: 1.5,
+        alignContent: 'left', 
+        justifyContent: 'start', 
+        padding: 0.05,
+        fontColor: new THREE.Color(0xFFFFFF),
+        fontSize: 0.04,
+        backgroundColor: new THREE.Color(0xd24f39)
+    });
+    popSign.add(
+        new ThreeMeshUI.Text({
+            content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
+        })
+    );
+    popSign.position.set(0, -0.2, 0); //move to right
 
-    // //Add exit to signin popup (deletePopupUI to parent obj)
-    // // Signup Exit button 
-    // const signExitContain = new ThreeMeshUI.Block({ //contains exit button
-    //     fontFamily: font_json_bold,
-    //     fontTexture: font_png_bold,
-    //     alignContent: 'right',
-    //     justifyContent: 'start',
-    //     height: 1.1,
-    //     width: 1,
-    //     padding: 0.05
-    // });
-    // const signExit = new ThreeMeshUI.Block({
-    //     width: 0.08,
-    //     height: 0.08,
-    //     justifyContent: 'center',
-    //     alignContent: 'center'
-    // });
-    // signExit.add(
-    //     new ThreeMeshUI.Text({content:"X"})
-    // );
+    //Add exit to signin popup (deletePopupUI to parent obj)
+    // Signup Exit button 
+    const signExitContain = new ThreeMeshUI.Block({ //contains exit button
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        alignContent: 'right',
+        justifyContent: 'start',
+        height: 0.3,
+        width: 1.5,
+        padding: 0.05,
+        backgroundOpacity: 0
+    });
+    const signExit = new ThreeMeshUI.Block({
+        width: 0.08,
+        height: 0.08,
+        justifyContent: 'center',
+        alignContent: 'center',
+        fontColor: new THREE.Color(0x000000),
+    });
+    signExit.add(
+        new ThreeMeshUI.Text({content:"X"})
+    );
 
-    // signExit.setupState({
-    //     state: "selected",
-    //     attributes: selectedAttributes,
-    //     onSet: () => {
-    //         deletePopupUI(signExit); 
-    //     }
-    // });
-    // signExit.setupState(hoveredStateAttributes);
-    // signExit.setupState(idleStateAttributes);
+    signExit.setupState({
+        state: "selected",
+        attributes: selectedAttributes,
+        onSet: () => {
+            deletePopupUI(signExit, 'sign'); 
+        }
+    });
+    signExit.setupState({
+        state: "hovered",
+        atributes: {
+            backgroundColor: new THREE.Color(0xd3d3d3),
+            backgroundOpacity: 1
+        }
+    });
+    signExit.setupState({
+        state: "idle",
+        attributes: {
+            backgroundOpacity: 1,
+            backgroundColor: new THREE.Color(0xFFFFFF)
+        }
+    });
 
-    // signExitContain.add(signExit);
-    // objsToTest.push(signExit);
+    signExitContain.add(signExit);
+    objsToTest.push(signExit);
 
-    // popSign.add(signExitContain);
+    popSign.add(signExitContain);
 
-    // //Button on signin to submit 
-    // const submitBut = new ThreeMeshUI.Block({
-    //     fontFamily: font_json_bold,
-    //     fontTexture: font_png_bold,
-    //     alignContent: 'center',
-    //     justifyContent: 'center',
-    //     height: 0.1, 
-    //     width: 0.2, 
-    //     contentDirection: 'row-reverse'
-    // });
-    // submitBut.add(
-    //     new ThreeMeshUI.Text({
-    //         content: 'Submit'
-    //     })
-    // );
-    // //Config for submit button 
-    // submitBut.setupState({
-    //     state: "selected",
-    //     attributes:selectedAttributes,
-    //     onSet: () => {
-    //         //delete existing children of popClips (including popSign)
-    //         popClips.remove(popSign);
-    //         const signin = scene.getObjectByName('signin');
-    //         const text = scene.getObjectByName('clipstext');
-    //         popClips.remove(signin, text);
+    //Button on signin to submit 
+    const submitBut = new ThreeMeshUI.Block({
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontColor: new THREE.Color(0x000000),
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: 0.1, 
+        width: 0.2, 
+        offset: 0.03,
+        contentDirection: 'row-reverse'
+    });
+    submitBut.add(
+        new ThreeMeshUI.Text({
+            content: 'Submit'
+        })
+    );
+    //Config for submit button 
+    submitBut.setupState({
+        state: "selected",
+        attributes:selectedAttributes,
+        onSet: () => {
+            //delete existing children of popClips (including popSign)
+            popClips.remove(popSign);
+            const signin = scene.getObjectByName('signin');
+            const text = scene.getObjectByName('clipstext');
+            popClips.remove(signin, text);
 
-    //         //add new clip static text
-    //         popClips.add(
-    //             new ThreeMeshUI.Text({
-    //                 content: 'Clips\n------ \n\n 0:00:00 A new clip here'
-    //             })
-    //         );    
-    //     }
-    // });
-    // submitBut.setupState(hoveredStateAttributes);
-    // submitBut.setupState(idleStateAttributes);
-    // objsToTest.push(submitBut);
-    // popSign.add(submitBut);
+            //add new clip static text
+            popClips.add(
+                new ThreeMeshUI.Text({
+                    content: '\n0:00:00 A new clip here\n0:01:00 Another new clip',
+                    fontFamily: font_json,
+                    fontTexture: font_png,
+                    fontSize: 0.04
+                })
+            );    
+        }
+    });
+    submitBut.setupState({        
+        state: "hovered",
+        atributes: {
+            backgroundColor: new THREE.Color(0xd3d3d3),
+            backgroundOpacity: 1
+        }
+    });
+    submitBut.setupState({        
+        state: "idle",
+        attributes: {
+            backgroundOpacity: 1,
+            backgroundColor: new THREE.Color(0xFFFFFF)
+        }
+    });
+    objsToTest.push(submitBut);
+    popSign.add(submitBut);
+    submitBut.position.set(0, -0.07, 0);
 
-    // //Add signin popup to clips popup
-    // popSign.visible = false;
-    // popClips.add(popSign); 
+    //Add signin popup to clips popup
+    popSign.visible = false;
+    popClips.add(popSign); 
     
-    // //Button on Clips popup to signin
-    // const signinBut = new ThreeMeshUI.Block({
-    //     fontFamily: font_json_bold,
-    //     fontTexture: font_png_bold,
-    //     alignContent: 'center',
-    //     justifyContent: 'center',
-    //     height: 0.1, 
-    //     width: 0.3, 
-    //     contentDirection: 'row-reverse'
-    // });
-    // signinBut.add(
-    //     new ThreeMeshUI.Text({
-    //         content: 'Create Clip'
-    //     })
-    // );
+    //Button on Clips popup to signin
+    const signinBut = new ThreeMeshUI.Block({
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: 0.1, 
+        width: 0.3, 
+        contentDirection: 'row-reverse'
+    });
+    signinBut.add(
+        new ThreeMeshUI.Text({
+            content: 'Create Clip'
+        })
+    );
 
-    // //Config for signin button 
-    // signinBut.setupState({
-    //     state: "selected",
-    //     attributes:selectedAttributes,
-    //     onSet: () => {
-    //         //make signin popup appear
-    //         popSign.visible = true;
-    //     }
-    // });
-    // signinBut.setupState(hoveredStateAttributes);
-    // signinBut.setupState(idleStateAttributes);
-    // signinBut.name = 'signin';
-    // objsToTest.push(signinBut);
-    // popClips.add(signinBut);
+    //Config for signin button 
+    signinBut.setupState({
+        state: "selected",
+        attributes:selectedAttributes,
+        onSet: () => {
+            //make signin popup appear
+            popSign.visible = true;
+        }
+    });
+    signinBut.setupState(hoveredStateAttributes);
+    signinBut.setupState({
+        state: "idle",
+        attributes: {
+            backgroundColor: new THREE.Color(0xc72408)
+        }
+    });
+    signinBut.name = submitBut.name = signExit.name = 'signin';
+    signinBut.position.set(-0.65, 0.05, 0); //move to left
+    objsToTest.push(signinBut);
+    popClips.add(signinBut);
 
     // Red underline 
     const box = new THREE.PlaneGeometry(0.06, 0.02);
@@ -310,7 +359,7 @@ function makePopupUI() {
         fontTexture: font_png_bold,
         fontSize: 0.055
     });
-    clipsText.name = 'clipstext';
+    clipsText1.name = 'clipstext';
     popClips.add(clipsText, clipsText1);
     clipsText1.position.set(0, -0.05, 0);
 
@@ -358,40 +407,14 @@ function makePopupUI() {
     // Set container to invisible as default
     container.visible = false;
 }
-
-function deletePopupUI(obj) {
-    //obj: exit, obj.parent: exitContain, obj.parent.parent: container or popSign
-    const curr = obj.parent.parent;
-    curr.visible = false;
-}
-
-// Make an underline, given coordinates 
-function makeUnderlines(x, y, z) {
-    const box = new THREE.PlaneGeometry(0.04, 0.007);
-    const material = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
-    const plane = new THREE.Mesh(box, material);
-    plane.position.set(x, y, z);
-    plane.name = "underline";
-    plane.visible = false;
-    scene.getObjectByName('UI').add(plane);
-    return plane;
-}
-
-// Toggle visibility of chosen underline
-function showUnder(id) {
-    underArr.forEach((under, i) => {
-		under.visible = i === id ? true : false;
-	});
-}
     
 
-// MENU BUTTONS UI -------------------------------------------------------------------
+// MAIN MENU BUTTONS UI CREATION -------------------------------------------------------------------
 function makeMenuUI() {
     // Group which contains all menu UI
     const menuContain = new THREE.Group(); 
     menuContain.name = "UI";
     scene.add(menuContain);
-    // menuContain.position.set(0, 0, -1.5) 
 
     // BUTTONS
     const buttonOptions = {
@@ -521,134 +544,25 @@ function makeMenuUI() {
         contentDirection: 'row-reverse' //for buttons to be horizontal
     });
 
-    // HERE
-    // buttonContain.position.set(0, 1, -1); //set position of main menu //use z=-1? 
     buttonContain.position.set(0, 0, -0.3) 
     buttonContain.rotation.x = -0.5;
-    // buttonContain.position.set(0, 1.5, 1); 
     buttonContain.add(buttonCite, buttonShare, buttonClips, buttonDetails, buttonTranscript);
     objsToTest.push(buttonTranscript, buttonDetails, buttonClips, buttonShare, buttonCite);
     menuContain.add(buttonContain);
 
     // Make all underlines 
-    const tranUnder = makeUnderlines(-0.52, 1.47, 1.03); 
-    const detUnder = makeUnderlines(-0.26, 1.47, 1.03);
-    const clipsUnder = makeUnderlines(0, 1.47, 1.03);
-    const shareUnder = makeUnderlines(0.26, 1.47, 1.03);
-    const citeUnder = makeUnderlines(0.52, 1.47, 1.03);
+    const tranUnder = makeUnderlines(-0.52, -0.01, -0.27); 
+    const detUnder = makeUnderlines(-0.26, -0.01, -0.27);
+    const clipsUnder = makeUnderlines(0, -0.01, -0.27);
+    const shareUnder = makeUnderlines(0.26, -0.01, -0.27);
+    const citeUnder = makeUnderlines(0.52, -0.01, -0.27);
+
     underArr = [tranUnder, detUnder, clipsUnder, shareUnder, citeUnder];
 
-
-    // Create video controls: play/pause, rewind and fastforward 
-    // container for all video controls
-    const controlsContain = new ThreeMeshUI.Block({
-        height: 0.15,
-        width: 1, 
-        justifyContent:'center',
-        contentDirection: 'row-reverse',
-        backgroundOpacity: 0,
-        margin: 0.03
-    });
-    controlsContain.position.set(0, 0.5, 1);
-    menuContain.add(controlsContain);
-
-    // New Idle State properties for video controls
-    const idleStateControls = {
-        state: "idle",
-        attributes: {
-            backgroundColor: new THREE.Color(0xFFFFFF)
-        }
-    };
-    // Play/pause button
-    const playpause = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
-        justifyContent: 'start',
-        alignContent: 'center',
-        padding: 0.02,
-        margin: 0.02
-    });
-    const play = new THREE.TextureLoader().load('/360videodemo/assets/play.png');
-    const pause = new THREE.TextureLoader().load('/360videodemo/assets/pause.png');
-    playpause.set({backgroundTexture: pause});
-    let trigger = true; //video starts playing automatically
-    const video = document.getElementById('video');
-    playpause.setupState({
-        state: "selected",
-        attributes: selectedAttributes,
-        onSet: () => {
-            if (trigger){
-                playpause.set({backgroundTexture: play});
-                video.pause();
-                trigger = false;
-            }else {
-                playpause.set({backgroundTexture: pause});
-                video.play();
-                trigger = true;
-            }
-        }
-    });
-    playpause.setupState(hoveredStateAttributes);
-    playpause.setupState(idleStateControls);
-    controlsContain.add(playpause);
-    objsToTest.push(playpause);
-
-    // Fastfoward button
-    const fastForward = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
-        justifyContent: 'start',
-        alignContent: 'center',
-        padding: 0.02
-    });
-    const forward = new THREE.TextureLoader().load('/360videodemo/assets/fastforward.png');
-    fastForward.set({backgroundTexture: forward});
-    fastForward.setupState({
-        state: "selected",
-        attributes: selectedAttributes,
-        onSet: () => {
-            video.currentTime = video.duration;
-        }
-    });
-    fastForward.setupState(hoveredStateAttributes);
-    fastForward.setupState(idleStateControls);
-
-    // Rewind button
-    const rewind = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
-        justifyContent: 'start',
-        alignContent: 'center',
-        padding: 0.02
-    });
-    const rewindIcon = new THREE.TextureLoader().load('/360videodemo/assets/rewind.png');
-    rewind.set({backgroundTexture: rewindIcon});
-    rewind.setupState({
-        state: "selected",
-        attributes: selectedAttributes,
-        onSet: () => {
-            video.currentTime = 0;
-        }
-    });
-    rewind.setupState(hoveredStateAttributes);
-    rewind.setupState(idleStateControls);
-    
-    // To create margins around the control buttons 
-    const filler1 = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.08, 
-        backgroundOpacity: 0
-    });
-    const filler2 = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.08,
-        backgroundOpacity: 0
-    });
-
-    // Add all video controls to container 
-    fastForward.name = playpause.name = rewind.name = 'vidcontrols';
-    controlsContain.add(fastForward, filler1, playpause, filler2, rewind);
-    objsToTest.push(fastForward, playpause, rewind);
+    // Create and add video controls to menuContain 
+    makeVideoControls();
+    const vid = scene.getObjectByName('controlsContain');
+    menuContain.add(vid);
 
 
     // Add popups to menuContain
@@ -664,41 +578,9 @@ function makeMenuUI() {
     });
     objsToTest.push(menuContain);
 
-
     // 2745: Add entire menu as child of camera so it stays fixed in space
     // camera.add(menuContain); 
-    // menuContain.position.set(0, 0, -1.5) 
-    menuContain.position.set(0, 0.88, -1); //for dev
+    menuContain.position.set(0, 0.88, -1); 
 }
 
-// Toggle visibility of the chosen popup
-function showPop(id) {
-    const curr = scene.getObjectByName('popUI');
-    if (!curr.visible){
-        curr.visible = true;
-    }
-	popupsArr.forEach((pop, i) => {
-		pop.visible = i === id ? true : false;
-	});
-};
-
-
-// Hide visibility of all UI present 
-function deleteUI() {
-    const curr = scene.getObjectByName('UI');
-    curr.visible = false;
-    curr.children.forEach(function(object){
-        object.visible = false;
-    });    
-}
-
-// Make menu bar visible 
-function menuUIVisible() {
-    const curr = scene.getObjectByName('UI');
-    curr.visible = true;
-    curr.children.forEach(function(object){
-        if (object.name != 'popUI' && object.name != 'underline') object.visible = true;
-    });
-}
-
-export { makeMenuUI, deleteUI, menuUIVisible };
+export { makeMenuUI, popupsArr, underArr };
