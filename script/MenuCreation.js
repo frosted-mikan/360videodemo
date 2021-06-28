@@ -5,6 +5,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
 import { deletePopupUI, makeUnderlines, showUnder, showPop, makeVideoControls } from '/360videodemo/script/MenuHelpers.js';
+// import { keyboard } from '/360videodemo/script/Keyboard.js';
 
 
 let popupsArr; //toggle between the popups
@@ -128,10 +129,16 @@ function makePopupUI() {
     });
     popSign.add(
         new ThreeMeshUI.Text({
-            content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
+            // content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
+            content: 'Sign in: '
         })
     );
-    popSign.position.set(0, -0.2, 0); //move to right
+    popSign.position.set(0, -0.2, 0); 
+
+    // Add keyboard for input to signin box
+    // keyboard();
+    // popSign.add(scene.getObjectByName('keyboard'));
+    //
 
     //Add exit to signin popup (deletePopupUI to parent obj)
     // Signup Exit button 
