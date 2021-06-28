@@ -4,7 +4,6 @@
 
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { camera, scene, objsToTest, renderer, mouse, vrControl, selectState } from '/360videodemo/script/script.js';
-import { menuUIVisible, deleteUI } from '/360videodemo/script/MenuHelpers.js';
 
 
 let curr; // keep track of current object selected
@@ -13,6 +12,8 @@ const raycaster = new THREE.Raycaster();
 
 function updateButtons() {
     let intersect;
+
+    if (!scene.getObjectByName('UI').visible) curr = null; //if menu disappears, clear selection
 
     if (renderer.xr.isPresenting) { // Entered VR
         vrControl.setFromController(0, raycaster.ray);
@@ -38,16 +39,7 @@ function updateButtons() {
         } else {
             intersect.object.setState('hovered');
         }
-    } else {
-
-        // TODO: main menu doesn't disappear on click 
-        // Call up/dismiss menu when area outside UI is clicked (2743)
-        if (selectState) {
-            deleteUI();
-            menuUIVisible();
-            curr = null;
-        }
-    }
+    } 
 
     objsToTest.forEach((obj) => {
         if ((!intersect || obj !== intersect.object) && obj.isUI && obj != curr) {

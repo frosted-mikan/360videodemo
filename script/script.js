@@ -9,7 +9,7 @@ import { DragControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm
 import { VRButton } from '/360videodemo/script/VRButton.js';
 import VRControl from '/360videodemo/script/VRControl.js';
 import { makeMenuUI } from '/360videodemo/script/MenuCreation.js';
-import { deleteUI } from '/360videodemo/script/MenuHelpers.js';
+import { deleteUI, menuUIVisible } from '/360videodemo/script/MenuHelpers.js';
 import { updateButtons, raycast } from '/360videodemo/script/ButtonInteraction.js';
 
 
@@ -29,9 +29,17 @@ window.addEventListener('pointermove', (event) => {
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 });
 
-window.addEventListener('pointerdown', () => {selectState = true});
+// trigger visibility of menu with space bar
+document.body.onkeyup = function(e){
+    if(e.keyCode == 32){
+        if (scene.getObjectByName('UI').visible) deleteUI();
+        else menuUIVisible();
+    }
+}
+// for pressing buttons 
+window.addEventListener('pointerdown', () => {selectState = true;});
 
-window.addEventListener('pointerup', () => {selectState = false});
+window.addEventListener('pointerup', () => {selectState = false;});
 
 window.addEventListener('touchstart', (event) => {
     selectState = true;
@@ -155,6 +163,10 @@ function init() {
     scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
     vrControl.controllers[0].addEventListener('selectstart', onSelectStart);
     vrControl.controllers[0].addEventListener('selectend', onSelectEnd);
+    vrControl.controllers[0].addEventListener('squeezestart', ()=> { 
+        if (scene.getObjectByName('UI').visible) deleteUI();
+        else menuUIVisible();
+    });
 
     scene.add(camera);
 
