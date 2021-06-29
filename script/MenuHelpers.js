@@ -69,11 +69,11 @@ function menuUIVisible() {
 function makeVideoControls() {
     // container for all video controls
     const controlsContain = new ThreeMeshUI.Block({
-        height: 0.15,
-        width: 1, 
+        height: 0.12,
+        width: 0.6, 
         justifyContent:'center',
         contentDirection: 'row-reverse',
-        backgroundOpacity: 0,
+        backgroundOpacity: 1,
         margin: 0.03
     });
     controlsContain.position.set(0, -0.15, -0.3);
@@ -91,20 +91,20 @@ function makeVideoControls() {
     const hoveredStateAttributes = {
         state: "hovered",
         attributes: {
-            backgroundColor: new THREE.Color(0xd24f39),
+            backgroundColor: new THREE.Color(0xc2c2c2),
             backgroundOpacity: 1
         },
     };
     const selectedAttributes = {
         offset: 0.02,
-        backgroundColor: new THREE.Color(0xc72408),
+        backgroundColor: new THREE.Color(0xc2c2c2),
         backgroundOpacity: 1
     };
 
     // Play/pause button
     const playpause = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
+        height: 0.07,
+        width: 0.07,
         justifyContent: 'start',
         alignContent: 'center',
         padding: 0.02,
@@ -114,7 +114,9 @@ function makeVideoControls() {
     const video = document.getElementById('video');
 
     const play = new THREE.TextureLoader().load('/360videodemo/assets/play.png');
+    
     const pause = new THREE.TextureLoader().load('/360videodemo/assets/pause.png');
+    
     playpause.set({backgroundTexture: pause});
     let trigger = true; //video starts playing automatically
 
@@ -138,13 +140,18 @@ function makeVideoControls() {
 
     // Fastfoward button
     const fastForward = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
+        height: 0.07,
+        width: 0.07,
         justifyContent: 'start',
         alignContent: 'center',
         padding: 0.02
     });
     const forward = new THREE.TextureLoader().load('/360videodemo/assets/fastforward.png');
+        // // scale x2 proportional
+    forward.wrapS = THREE.RepeatWrapping;
+    forward.wrapT = THREE.RepeatWrapping;
+    forward.repeat.set(4, 4);
+
     fastForward.set({backgroundTexture: forward});
     fastForward.setupState({
         state: "selected", 
@@ -158,8 +165,8 @@ function makeVideoControls() {
 
     // Rewind button
     const rewind = new ThreeMeshUI.Block({
-        height: 0.1,
-        width: 0.1,
+        height: 0.07,
+        width: 0.07,
         justifyContent: 'start',
         alignContent: 'center',
         padding: 0.02

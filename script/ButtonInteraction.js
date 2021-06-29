@@ -32,7 +32,7 @@ function updateButtons() {
         if (selectState) {
             if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible)) {
                 intersect.object.setState('selected');
-                if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin'){
+                if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' && intersect.object.name !='keys'){
                     curr = intersect.object;
                 }
             }

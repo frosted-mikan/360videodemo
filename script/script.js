@@ -23,69 +23,78 @@ mouse.x = mouse.y = null;
 
 let selectState = false; // whether buttons have been selected
 
-// EventListeners for mouse
-window.addEventListener('pointermove', (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-});
-
-// trigger visibility of menu with space bar
-document.body.onkeyup = function(e){
-    if(e.keyCode == 32){
-        if (scene.getObjectByName('UI').visible) deleteUI();
-        else menuUIVisible();
-    }
-}
-// for pressing buttons 
-window.addEventListener('pointerdown', () => {selectState = true;});
-
-window.addEventListener('pointerup', () => {selectState = false;});
-
-window.addEventListener('touchstart', (event) => {
-    selectState = true;
-    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
-});
-
-window.addEventListener('touchend', () => {
-    selectState = false;
-    mouse.x = null;
-    mouse.y = null;
-});
-
-
-// UI disappears if idle for 10 seconds: mouse ver. 
-var timeout;
-document.onmousemove = function() {
-  clearTimeout(timeout);
-  timeout = setTimeout(function() {
-      const curr = scene.getObjectByName('UI');
-      if (curr.visible){
-          deleteUI();
-      }
-    }, 10000);
-}
 
 // Enter VR mode on fullscreen
 const video = document.getElementById('video');
 function openFullscreen() {
     video.style.display = 'none';
+    enterVR(); 
     init();
     animate();
     makeMenuUI();
 }
 // TESTING
-// document.querySelector('button').addEventListener('click', openFullscreen);
-openFullscreen(); 
+document.querySelector('button').addEventListener('click', openFullscreen);
+// openFullscreen(); 
+
+// ---------------------------------------------------------------------------------------
+
+// Set listeners on fullscreen
+function enterVR() {
+    // EventListeners for mouse
+    window.addEventListener('pointermove', (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // trigger visibility of menu by pressing any key...except spacebar...
+    document.body.onkeyup = function(e){
+        if (e.keyCode == 32){
+            return false;
+        }
+        if (scene.getObjectByName('UI').visible) deleteUI();
+        else menuUIVisible();
+    };
+      
+    // for pressing buttons 
+    window.addEventListener('pointerdown', () => {selectState = true;});
+
+    window.addEventListener('pointerup', () => {selectState = false;});
+
+    window.addEventListener('touchstart', (event) => {
+        selectState = true;
+        mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('touchend', () => {
+        selectState = false;
+        mouse.x = null;
+        mouse.y = null;
+    });
 
 
+    // UI disappears if idle for 10 seconds: mouse ver. 
+    var timeout;
+    document.onmousemove = function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        const curr = scene.getObjectByName('UI');
+        if (curr.visible){
+            deleteUI();
+        }
+        }, 10000);
+    }
+
+}
+
+// Init three.js scene
 function init() {
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
     camera.layers.enable(1); // render left view when no stereo available
 
     // Video
     video.play();
-
     const texture = new THREE.VideoTexture(video);
 
     scene = new THREE.Scene();
@@ -94,12 +103,6 @@ function init() {
     const geometry1 = new THREE.SphereGeometry(500, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry1.scale(-1, 1, 1);
-
-    const uvs1 = geometry1.attributes.uv.array;
-
-    for (let i = 0; i < uvs1.length; i += 2) {
-        uvs1[i] *= 0.5;
-    }
 
     const material1 = new THREE.MeshBasicMaterial({map: texture});
 
@@ -112,13 +115,6 @@ function init() {
     const geometry2 = new THREE.SphereGeometry(500, 60, 40);
     geometry2.scale(-1, 1, 1);
 
-    const uvs2 = geometry2.attributes.uv.array;
-
-    for (let i = 0; i < uvs2.length; i += 2) {
-        uvs2[i] *= 0.5;
-        // uvs2[i] += 0.5; // for stereoscopic view
-    }
-
     const material2 = new THREE.MeshBasicMaterial({map: texture});
 
     const mesh2 = new THREE.Mesh(geometry2, material2);
@@ -126,7 +122,8 @@ function init() {
     mesh2.layers.set(2); // display in right eye only
     scene.add(mesh2);
 
-    renderer = new THREE.WebGLRenderer();
+    // Set up renderer
+    renderer = new THREE.WebGLRenderer({antialias: true});
     // renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);

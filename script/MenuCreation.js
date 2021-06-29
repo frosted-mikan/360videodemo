@@ -5,7 +5,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
 import { deletePopupUI, makeUnderlines, showUnder, showPop, makeVideoControls } from '/360videodemo/script/MenuHelpers.js';
-// import { keyboard } from '/360videodemo/script/Keyboard.js';
+import { keyboard } from '/360videodemo/script/Keyboard.js';
 
 
 let popupsArr; //toggle between the popups
@@ -33,7 +33,8 @@ function makePopupUI() {
         justifyContent: 'start',
         height: 0.8,
         width: 1.8,
-        padding: 0.05
+        padding: 0.05,
+        backgroundOpacity: 1
     });
     container.name = "popUI"; 
     container.position.set(0, 0.5, -0.3);
@@ -53,20 +54,19 @@ function makePopupUI() {
         state: "idle",
         attributes: {
             backgroundOpacity: 1,
-            backgroundColor: new THREE.Color(0x000000)
+            backgroundColor: new THREE.Color(0xffffff)
         },
     };
 
     // Exit button 
+    const exitIcon = new THREE.TextureLoader().load('/360videodemo/assets/exit.png');
     const exit = new ThreeMeshUI.Block({
         width: 0.08,
         height: 0.08,
         justifyContent: 'center',
-        alignContent: 'center'
+        alignContent: 'center',
+        backgroundTexture: exitIcon
     });
-    exit.add(
-        new ThreeMeshUI.Text({content:"X"})
-    );
 
     const selectedAttributes = {
         offset: 0.02,
@@ -97,8 +97,7 @@ function makePopupUI() {
         justifyContent: 'start', 
         padding: 0.1,
         fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.04, 
-        backgroundOpacity: 0.5
+        fontSize: 0.04
     };
 
     const popTranscript = new ThreeMeshUI.Block(popupAttributes);
@@ -136,8 +135,8 @@ function makePopupUI() {
     popSign.position.set(0, -0.2, 0); 
 
     // Add keyboard for input to signin box
-    // keyboard();
-    // popSign.add(scene.getObjectByName('keyboard'));
+    keyboard();
+    popSign.add(scene.getObjectByName('keyboard'));
     //
 
     //Add exit to signin popup (deletePopupUI to parent obj)
@@ -157,11 +156,8 @@ function makePopupUI() {
         height: 0.08,
         justifyContent: 'center',
         alignContent: 'center',
-        fontColor: new THREE.Color(0x000000),
+        backgroundTexture: exitIcon
     });
-    signExit.add(
-        new ThreeMeshUI.Text({content:"X"})
-    );
 
     signExit.setupState({
         state: "selected",
@@ -173,17 +169,11 @@ function makePopupUI() {
     signExit.setupState({
         state: "hovered",
         atributes: {
-            backgroundColor: new THREE.Color(0xd3d3d3),
+            backgroundColor: new THREE.Color(0xc2c2c2),
             backgroundOpacity: 1
         }
     });
-    signExit.setupState({
-        state: "idle",
-        attributes: {
-            backgroundOpacity: 1,
-            backgroundColor: new THREE.Color(0xFFFFFF)
-        }
-    });
+    signExit.setupState(idleStateAttributes);
 
     signExitContain.add(signExit);
     objsToTest.push(signExit);
