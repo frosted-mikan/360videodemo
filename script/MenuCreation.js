@@ -6,6 +6,7 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
 import { deletePopupUI, makeUnderlines, showUnder, showPop, makeVideoControls } from '/360videodemo/script/MenuHelpers.js';
 import { keyboard } from '/360videodemo/script/Keyboard.js';
+import { makeClips, makeTranscriptText } from '/360videodemo/script/PopupContent.js';
 
 
 let popupsArr; //toggle between the popups
@@ -79,6 +80,7 @@ function makePopupUI() {
         attributes: selectedAttributes,
         onSet: () => {
             deletePopupUI(exit, 'exit');
+            scene.getObjectByName('keysFull').visible = false;
         }
     });
     exit.setupState(hoveredStateAttributes);
@@ -117,22 +119,34 @@ function makePopupUI() {
     const popSign = new ThreeMeshUI.Block({
         fontFamily: font_json_bold,
         fontTexture: font_png_bold,
-        height: 0.3,
-        width: 1.5,
+        height: 0.8,
+        width: 0.6,
         alignContent: 'left', 
         justifyContent: 'start', 
-        padding: 0.05,
+        padding: 0.08,
         fontColor: new THREE.Color(0xFFFFFF),
-        fontSize: 0.04,
-        backgroundColor: new THREE.Color(0xd24f39)
+        fontSize: 0.05,
+        backgroundColor: new THREE.Color(0xd24f39),
+        backgroundOpacity: 1
     });
     popSign.add(
         new ThreeMeshUI.Text({
-            // content: 'Sign in:\n------\n\nemail: *****\npassword: ******'
-            content: 'Sign in: '
+            content: 'Sign in'
         })
     );
-    popSign.position.set(0, -0.2, 0); 
+    const signText = new ThreeMeshUI.Text({
+        content: 'Email:',
+        fontSize: 0.04
+    });
+    const signText2 = new ThreeMeshUI.Text({
+        content: 'Password:',
+        fontSize: 0.04
+    });
+    popSign.add(signText, signText2);
+    popSign.name = 'popsign';
+    signText.position.set(-0.14, -0.08, 0);
+    signText2.position.set(-0.24, -0.25, 0);
+    popSign.position.set(1.25, 0, 0); 
 
     // Add keyboard for input to signin box
     keyboard();
@@ -146,8 +160,8 @@ function makePopupUI() {
         fontTexture: font_png_bold,
         alignContent: 'right',
         justifyContent: 'start',
-        height: 0.3,
-        width: 1.5,
+        height: 0.8,
+        width: 0.6,
         padding: 0.05,
         backgroundOpacity: 0
     });
@@ -164,6 +178,7 @@ function makePopupUI() {
         attributes: selectedAttributes,
         onSet: () => {
             deletePopupUI(signExit, 'sign'); 
+            scene.getObjectByName('keysFull').visible = false;
         }
     });
     signExit.setupState({
@@ -208,15 +223,11 @@ function makePopupUI() {
             const text = scene.getObjectByName('clipstext');
             popClips.remove(signin, text);
 
+            //remove keyboard
+            scene.getObjectByName('keysFull').visible = false;
             //add new clip static text
-            popClips.add(
-                new ThreeMeshUI.Text({
-                    content: '\n0:00:00 A new clip here\n0:01:00 Another new clip',
-                    fontFamily: font_json,
-                    fontTexture: font_png,
-                    fontSize: 0.04
-                })
-            );    
+            makeClips();
+            popClips.add(scene.getObjectByName('newclips'));
         }
     });
     submitBut.setupState({        
@@ -235,7 +246,7 @@ function makePopupUI() {
     });
     objsToTest.push(submitBut);
     popSign.add(submitBut);
-    submitBut.position.set(0, -0.07, 0);
+    submitBut.position.set(0, -0.15, 0);
 
     //Add signin popup to clips popup
     popSign.visible = false;
@@ -273,8 +284,9 @@ function makePopupUI() {
             backgroundColor: new THREE.Color(0xc72408)
         }
     });
-    signinBut.name = submitBut.name = signExit.name = 'signin';
-    signinBut.position.set(-0.65, 0.05, 0); //move to left
+    signinBut.name = 'signin';
+    submitBut.name = signExit.name = 'input';
+    signinBut.position.set(-0.65, 0.05, 0.03); //move to left
     objsToTest.push(signinBut);
     popClips.add(signinBut);
 
@@ -287,22 +299,16 @@ function makePopupUI() {
     container.add(plane); 
 
     // Transcript Text
-    const tranText = new ThreeMeshUI.Text({
-        content: '0:00:00 TRANSCRIPT OF VIDEO FILE:\n\n0:00:50 UNKNOWN: The dream is building machines that can go anywhere a person or animal can go, thats how I see the future',
-        fontFamily: font_json,
-        fontTexture: font_png,
-        fontSize: 0.04
-    });
+    makeTranscriptText();
     popTranscript.add(
         new ThreeMeshUI.Text({
             content: 'Transcript\n',
             fontFamily: font_json_bold,
             fontTexture: font_png_bold,
             fontSize: 0.055
-        }), 
-        tranText
+        }),
+        scene.getObjectByName('trantext')
     );
-    tranText.position.set(0, -0.05, 0);
 
     // Details Text
     const detText1 = new ThreeMeshUI.Text({
@@ -329,6 +335,18 @@ function makePopupUI() {
         fontTexture: font_png,
         fontSize: 0.04
     })
+    const detText5 = new ThreeMeshUI.Text({
+        content: 'Producer\n',
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontSize: 0.045
+    });
+    const detText6 = new ThreeMeshUI.Text({
+        content: 'Ari Palitz\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    })
     popDetails.add(
         new ThreeMeshUI.Text({
             content: 'Details\n',
@@ -336,12 +354,14 @@ function makePopupUI() {
             fontTexture: font_png_bold,
             fontSize: 0.055
         }),
-        detText1, detText2, detText3, detText4
+        detText1, detText2, detText3, detText4, detText5, detText6
     );
     detText1.position.set(0, -0.05, 0);
     detText2.position.set(0, -0.055, 0);
     detText3.position.set(0, -0.1, 0);
     detText4.position.set(0, -0.105, 0);
+    detText5.position.set(0, -0.15, 0);
+    detText6.position.set(0, -0.155, 0);
 
     // Clips Text
     const clipsText1 = new ThreeMeshUI.Text({
@@ -362,24 +382,92 @@ function makePopupUI() {
 
     // Share Text 
     const shareText1 = new ThreeMeshUI.Text({
-        content: 'Directed by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n\nTo embed your video in an LMS or other website\n------ \nhttps://video.alexanderstreet.com/watch/hello-robot',
+        content: 'Directed by David Gelb, With Marc Raibert, Produced by Ari Palitz, In The Possible (Los Angeles, CA: Within, 2017), 11 minutes\n',
         fontFamily: font_json,
         fontTexture: font_png,
         fontSize: 0.04
     });
+    const shareText2 = new ThreeMeshUI.Text({
+        content: 'To embed your video in an LMS or other website\n',
+        fontFamily: font_json_bold,
+        fontTexture: font_png_bold,
+        fontSize: 0.045
+    });
+    const shareText3 = new ThreeMeshUI.Text({
+        content: 'https://video.alexanderstreet.com/watch/hello-robot\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
+    const shareText4 = new ThreeMeshUI.Text({
+        content: 'iframe src="https://video.alexanderstreet.com/embed...\n',
+        fontFamily: font_json,
+        fontTexture: font_png,
+        fontSize: 0.04
+    });
+    // Red buttons (doesn't click)
+    const redButAttributes = {
+        fontFamily: '/360videodemo/assets/AvenirNextLTPro-Bold-msdf.json',
+        fontTexture: '/360videodemo/assets/AvenirNextLTPro-Bold.png',
+        alignContent: 'center',
+        justifyContent: 'center',
+        height: 0.1, 
+        width: 0.45, 
+        contentDirection: 'row-reverse',
+        backgroundColor: new THREE.Color(0xc72408), 
+        backgroundOpacity: 1
+    };
+    const permalink = new ThreeMeshUI.Block(redButAttributes);
+    const embed = new ThreeMeshUI.Block(redButAttributes);
+    permalink.add(
+        new ThreeMeshUI.Text({
+            content: 'Copy Permalink'
+        })
+    );
+    embed.add(
+        new ThreeMeshUI.Text({
+            content: 'Copy Embed Code'
+        })
+    );
     popShare.add(
         new ThreeMeshUI.Text({
             content: 'Hello Robot\n',
             fontFamily: font_json_bold,
             fontTexture: font_png_bold,
             fontSize: 0.055    
-        }), shareText1
+        }), shareText1, shareText2, shareText3, shareText4, permalink, embed
     );
     shareText1.position.set(0, -0.05, 0);
+    shareText2.position.set(0, -0.1, 0);
+    shareText3.position.set(0.05, -0.13, 0);
+    shareText4.position.set(0.05, -0.2, 0);
+    permalink.position.set(0.45, -0.08, 0);
+    embed.position.set(0.45, -0.2, 0);
 
     // Cite Text
+    const whiteborder = new ThreeMeshUI.Block({
+        height: 0.08, 
+        width: 0.45, 
+        contentDirection: 'row-reverse',
+        backgroundColor: new THREE.Color(0xffffff), 
+        backgroundOpacity: 0.5, 
+        justifyContent: 'center',
+        alignContent: 'left',
+        padding: 0.05,
+        fontFamily: '/360videodemo/assets/AvenirNextLTPro-Bold-msdf.json',
+        fontTexture: '/360videodemo/assets/AvenirNextLTPro-Bold.png',
+        fontSize: 0.05,
+        fontColor: new THREE.Color(0x000000)
+    });
+    whiteborder.add(new ThreeMeshUI.Text({content: 'MLA8'}));
+    const copycite = new ThreeMeshUI.Block(redButAttributes);
+    copycite.add(
+        new ThreeMeshUI.Text({
+            content: 'Copy Citation'
+        })
+    );
     const citeText1 = new ThreeMeshUI.Text({
-        content: 'MLA8\n\n"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.',
+        content: '"Hello, Robot." , directed by David Gelb., produced by Ari Palitz., Within, 2017. Alexander Street, https://video.alexanderstreet.com/watch/hello-robot.',
         fontFamily: font_json,
         fontTexture: font_png,
         fontSize: 0.04
@@ -390,9 +478,11 @@ function makePopupUI() {
             fontFamily: font_json_bold,
             fontTexture: font_png_bold,
             fontSize: 0.055    
-        }), citeText1
+        }), whiteborder, citeText1, copycite
     );
-    citeText1.position.set(0, -0.05, 0);
+    whiteborder.position.set(-0.57, 0.15, 0);
+    citeText1.position.set(0, -0.16, 0);
+    copycite.position.set(0, -0.16, 0);
     
     // Add all popups to container
     popTranscript.visible = popDetails.visible = popClips.visible = popShare.visible = popCite.visible = false;

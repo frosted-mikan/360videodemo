@@ -37,6 +37,7 @@ function showUnder(id) {
 
 // Toggle visibility of the chosen popup
 function showPop(id) {
+    if (id != 2) scene.getObjectByName('keysFull').visible = false; //remove keyboard if not clips
     const curr = scene.getObjectByName('popUI');
     if (!curr.visible){
         curr.visible = true;

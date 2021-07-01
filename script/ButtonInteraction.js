@@ -28,12 +28,26 @@ function updateButtons() {
         intersect = raycast();
     }
 
+    if (intersect) console.log(intersect.object.name);
+
+
     if (intersect && intersect.object.isUI && intersect.object.visible) {
         if (selectState) {
             if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible)) {
-                intersect.object.setState('selected');
-                if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' && intersect.object.name !='keys'){
-                    curr = intersect.object;
+                if (scene.getObjectByName('popsign')){
+                    if (!(intersect.object.name == 'input' && !scene.getObjectByName('popsign').visible)){
+                        intersect.object.setState('selected');
+                        if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' 
+                            && intersect.object.name !='keys' && intersect.object.name != 'input'){
+                            curr = intersect.object;
+                        }
+                    }
+                } else {
+                    intersect.object.setState('selected');
+                    if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' 
+                        && intersect.object.name !='keys' && intersect.object.name != 'input'){
+                        curr = intersect.object;
+                    }
                 }
             }
         } else {

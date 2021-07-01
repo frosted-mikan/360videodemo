@@ -85,7 +85,6 @@ function enterVR() {
         }
         }, 10000);
     }
-
 }
 
 // Init three.js scene
@@ -124,7 +123,7 @@ function init() {
 
     // Set up renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
-    // renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
+    renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;

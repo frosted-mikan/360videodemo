@@ -3,7 +3,7 @@
 */
 
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
-import { scene, objsToTest } from '/360videodemo/script/script.js';
+import { scene, objsToTest, camera } from '/360videodemo/script/script.js';
 
 var font_json_bold = "/360videodemo/assets/AvenirNextLTPro-Bold-msdf.json";
 var font_png_bold = "/360videodemo/assets/AvenirNextLTPro-Bold.png";
@@ -12,64 +12,125 @@ const colors = {
 	keyboardBack: 0x858585,
 	panelBack: 0xffffff,
 	button: 0x363636,
-	hovered: 0x1c1c1c,
-	selected: 0xd24f39,
+	hovered: 0xd3d3d3,
+	selected: 0x1c1c1c,
     font: 0x000000
 };
 
-let userText;
+let userText, emailText, passText; // text will appear here
+// Determines which panel is selected 
+var toggle = {
+	aInternal: false,
+	aListener: function() {},
+	set a(val) {
+	  this.aInternal = val;
+	  this.aListener(val);
+	},
+	get a() {
+	  return this.aInternal;
+	},
+	registerListener: function(listener) {
+	  this.aListener = listener;
+	}
+  }
+
 
 function keyboard () {
-    // const keyboardContain = new THREE.Group();
-    // keyboardContain.name = "keyboard";
-    // scene.add(keyboardContain);
+    const keyboardContain = new THREE.Group();
+    keyboardContain.name = "keyboard";
+    scene.add(keyboardContain);
 
-    const textPanel = new ThreeMeshUI.Block({
+	// White input boxes
+	const whiteBoxAttributes = {
     	fontFamily: font_json_bold,
 		fontTexture: font_png_bold,
-    	width: 0.5,
+    	width: 0.43,
     	height: 0.05,
     	backgroundColor: new THREE.Color(colors.panelBack),
     	backgroundOpacity: 1,
-        alignContent: 'center'
-    });
+        alignContent: 'center',
+		hiddenOverflow: true // inputs have hidden overflow 
+	};
+    const emailPanel = new ThreeMeshUI.Block(whiteBoxAttributes);
+    emailPanel.position.set(0, 0.14, 0.03); 
+	const passPanel = new ThreeMeshUI.Block(whiteBoxAttributes);
+	passPanel.position.set(0, -0.03, 0.03);
+	emailPanel.name = passPanel.name = 'input';
 
-    textPanel.position.set(-0.3, 0.09, 0.1); 
+    // User input text 
+    emailText = new ThreeMeshUI.Text({content: ''});
+	passText = new ThreeMeshUI.Text({content: ''});
 
-    //
-    userText = new ThreeMeshUI.Text({ content: '' });
-
-    const textField = new ThreeMeshUI.Block({
-    	width: 0.3,
+	// Text will appear here
+	const textFieldAttributes = {
+    	width: 0.4,
     	height: 0.05,
     	fontSize: 0.04,
+		fontFamily: font_json_bold,
+		fontTexture: font_png_bold,
     	padding: 0.002,
     	backgroundOpacity: 0,
         fontColor: new THREE.Color(colors.font),
         alignContent: 'left'
-    }).add(userText);
+	};
+    const emailField = new ThreeMeshUI.Block(textFieldAttributes).add(emailText);
+	const passField = new ThreeMeshUI.Block(textFieldAttributes).add(passText);
+	emailField.position.set(0, 0.14, 0.03);
+	passField.position.set(0, -0.03, 0.03);
+	emailPanel.add(emailField);
+	passPanel.add(passField);
+	keyboardContain.add(emailPanel, passPanel);
 
-    textPanel.add(textField);
-    textPanel.name = "keyboard";
-    // keyboardContain.add(textPanel);
-    scene.add(textPanel);
+	// Set up listener for which panel is selected
+	userText = emailText;
+	toggle.registerListener(function() {
+		if (!toggle.a) userText = emailText;
+		else userText = passText;
+	});
 
-    // TODO: textpanel hidden overflow?
-    // textPanel.setupState({
-    //     state: "selected",
-    //     onSet: () => {
-    //         scene.getObjectByName('keysFull').visible = true;
-    //     }
-    // });
-    // objsToTest.push(textPanel);
+	// Set panel states
+	emailPanel.setupState({
+		state: "idle",
+		attributes: whiteBoxAttributes
+	});
+	emailPanel.setupState({
+		state: "hovered",
+		attributes: {
+			backgroundColor: new THREE.Color(colors.hovered),
+		}
+	});
+    emailPanel.setupState({
+        state: "selected",
+        onSet: () => {
+            scene.getObjectByName('keysFull').visible = true;
+			toggle.a = false
+        }
+    });
+	passPanel.setupState({
+		state: "idle",
+		attributes: whiteBoxAttributes
+	});
+	passPanel.setupState({
+		state: "hovered",
+		attributes: {
+			backgroundColor: new THREE.Color(colors.hovered),
+		}
+	});
+    passPanel.setupState({
+        state: "selected",
+        onSet: () => {
+            scene.getObjectByName('keysFull').visible = true;
+			toggle.a = true;
+        }
+    });
+    objsToTest.push(emailPanel, passPanel);
+	makeKeyboard();
 
-    makeKeyboard();
-    textPanel.add(scene.getObjectByName('keysFull'));
 }
 
+// Make the actual keyboard
 function makeKeyboard() {
-
-	keyboard = new ThreeMeshUI.Keyboard({
+	const keyboard = new ThreeMeshUI.Keyboard({
 		fontFamily: font_json_bold,
 		fontTexture: font_png_bold,
 		fontSize: 0.035, 
@@ -80,16 +141,16 @@ function makeKeyboard() {
 	  	enterTexture: '/360videodemo/assets/enter.png'
 	});
 
-	keyboard.position.set(0.3, -0.7, 0.3);
-	keyboard.rotation.x = -0.55;
     keyboard.name = "keysFull";
-    // keyboard.visible = false;
+    keyboard.visible = false;
 	scene.add(keyboard);
+	camera.add(keyboard); //make keyboard fixed in view
+	keyboard.position.set(0, -0.5, -1.12);
+	keyboard.rotation.x = -0.55;
 
 	//
 
 	keyboard.keys.forEach((key)=> {
-
 		objsToTest.push(key);
         key.name = "keys";
 
@@ -97,7 +158,7 @@ function makeKeyboard() {
 			state: 'idle',
 			attributes: {
 				offset: 0,
-				backgroundColor: new THREE.Color( colors.button ),
+				backgroundColor: new THREE.Color(colors.button),
     			backgroundOpacity: 1
 			}
 		});
@@ -106,7 +167,7 @@ function makeKeyboard() {
 			state: 'hovered',
 			attributes: {
 				offset: 0,
-				backgroundColor: new THREE.Color( colors.hovered ),
+				backgroundColor: new THREE.Color(colors.hovered),
 				backgroundOpacity: 1
 			}
 		});
@@ -115,27 +176,24 @@ function makeKeyboard() {
 			state: 'selected',
 			attributes: {
 				offset: -0.009,
-				backgroundColor: new THREE.Color( colors.selected ),
+				backgroundColor: new THREE.Color(colors.selected),
 				backgroundOpacity: 1
 			},
 			// triggered when the user clicked on a keyboard's key
 			onSet: ()=> {
+				if (key.info.command) {
 
-				// if the key have a command (eg: 'backspace', 'switch', 'enter'...)
-				// special actions are taken
-				if ( key.info.command ) {
-
-					switch( key.info.command ) {
+					switch(key.info.command) {
 						case 'enter' :
-							userText.set({ content: userText.content += '\n' });
+							userText.set({content: userText.content += '\n'});
 							break;
 
 						case 'space' :
-							userText.set({ content: userText.content += ' ' });
+							userText.set({content: userText.content += ' '});
 							break;
 
 						case 'backspace' :
-							if ( !userText.content.length ) break
+							if (!userText.content.length) break
 							userText.set({
 								content: userText.content.substring(0, userText.content.length - 1) || ""
 							});
@@ -148,12 +206,9 @@ function makeKeyboard() {
 					};
 
 				// print a glyph, if any
-				} else if ( key.info.input ) {
-
-					userText.set({ content: userText.content += key.info.input });
-
+				} else if (key.info.input) {
+					userText.set({content: userText.content += key.info.input});
 				};
-
 			}
 		});
 
