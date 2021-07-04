@@ -53,7 +53,7 @@ function enterVR() {
         }
         if (scene.getObjectByName('UI').visible){
             deleteUI();
-            deleteKeyboard();
+            if (scene.getObjectByName('keysFull')) deleteKeyboard();
         }
         else {
             menuUIVisible();
@@ -84,7 +84,7 @@ function enterVR() {
     clearTimeout(timeout);
     timeout = setTimeout(function() {
         const curr = scene.getObjectByName('UI');
-            if (curr.visible){
+            if (curr.visible) {
                 deleteUI();
                 deleteKeyboard();
             }
@@ -165,8 +165,13 @@ function init() {
     vrControl.controllers[0].addEventListener('selectstart', onSelectStart);
     vrControl.controllers[0].addEventListener('selectend', onSelectEnd);
     vrControl.controllers[0].addEventListener('squeezestart', ()=> { 
-        if (scene.getObjectByName('UI').visible) deleteUI();
-        else menuUIVisible();
+        if (scene.getObjectByName('UI').visible) {
+            deleteUI();
+            if (scene.getObjectByName('keysFull')) deleteKeyboard();
+        }
+        else {
+            menuUIVisible();
+        }
     });
 
     scene.add(camera);
