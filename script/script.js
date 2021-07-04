@@ -51,8 +51,13 @@ function enterVR() {
         if (e.keyCode == 32){
             return false;
         }
-        if (scene.getObjectByName('UI').visible) deleteUI();
-        else menuUIVisible();
+        if (scene.getObjectByName('UI').visible){
+            deleteUI();
+            deleteKeyboard();
+        }
+        else {
+            menuUIVisible();
+        }
     };
       
     // for pressing buttons 
