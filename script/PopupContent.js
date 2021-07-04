@@ -9,7 +9,7 @@ import { scene } from '/360videodemo/script/script.js';
 function makeClips() {
     // Group with all elements 
     const clipsAll = new THREE.Group();
-    //
+    
     // Red Create clip button (doesn't click)
     const createClip = new ThreeMeshUI.Block({
         fontFamily: '/360videodemo/assets/AvenirNextLTPro-Bold-msdf.json',
@@ -29,7 +29,7 @@ function makeClips() {
     );
     clipsAll.add(createClip);
     createClip.position.set(0.5, 0.26, 0.03);
-    //
+    
     // Outer container with two columns 
     const clipsContain = new ThreeMeshUI.Block({ 
         height: 0.5,
@@ -42,7 +42,7 @@ function makeClips() {
     clipsAll.add(clipsContain);
     clipsContain.position.set(0.05, -0.05, 0.03);
     scene.add(clipsAll);
-    //
+    
     // First column 
     const firstCol = new ThreeMeshUI.Block({
         height: 0.5,
@@ -50,7 +50,7 @@ function makeClips() {
         alignContent: 'left',
         backgroundOpacity: 0
     });
-    // 
+    
     // Second column 
     const secCol = new ThreeMeshUI.Block({
         height: 0.5,
@@ -59,7 +59,7 @@ function makeClips() {
         backgroundOpacity: 0 
     });
     clipsContain.add(firstCol, secCol);
-    //
+    
     // New Clips
     const newclip = new THREE.TextureLoader().load('/360videodemo/assets/clipimg.png');
     const clipAttributes = {
@@ -84,7 +84,7 @@ function makeTranscriptText() {
     const tranAll = new THREE.Group();
     tranAll.name = 'trantext';
     scene.add(tranAll);
-    // 
+    
     //Outer container (row)
     const tranContain = new ThreeMeshUI.Block({ 
         height: 0.5,
@@ -95,7 +95,7 @@ function makeTranscriptText() {
     });
     tranContain.position.set(0.05, -0.05, 0);
     tranAll.add(tranContain);
-    //
+    
     //Text column 
     const firstCol = new ThreeMeshUI.Block({
         height: 0.5,
@@ -106,7 +106,7 @@ function makeTranscriptText() {
         fontTexture: '/360videodemo/assets/AvenirNextLTPro-Regular.png',
         fontSize: 0.04
     });
-    //
+    
     //Time codes column
     const secCol = new ThreeMeshUI.Block({
         height: 0.5,
@@ -115,6 +115,7 @@ function makeTranscriptText() {
         backgroundOpacity: 0
     });
     tranContain.add(firstCol, secCol);
+
     //Time codes 
     const timeAttributes = {
         height: 0.06,
@@ -137,7 +138,7 @@ function makeTranscriptText() {
     const time4 = new ThreeMeshUI.Block(timeAttributes);
     time4.add(new ThreeMeshUI.Text({content: '00:01:55'}))
     secCol.add(time1, time2, time3, time4);
-    //
+    
     //Transcript text
     const text1 = new ThreeMeshUI.Text({content: 'TRANSCRIPT OF VIDEO FILE:\n'});
     text1.position.set(0, -0.038, 0);

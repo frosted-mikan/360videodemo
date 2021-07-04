@@ -11,6 +11,7 @@ import VRControl from '/360videodemo/script/VRControl.js';
 import { makeMenuUI } from '/360videodemo/script/MenuCreation.js';
 import { deleteUI, menuUIVisible } from '/360videodemo/script/MenuHelpers.js';
 import { updateButtons, raycast } from '/360videodemo/script/ButtonInteraction.js';
+import { deleteKeyboard } from '/360videodemo/script/Keyboard.js';
 
 
 let camera, scene, renderer, vrControl, orbitControls, dragControls;
@@ -33,9 +34,7 @@ function openFullscreen() {
     animate();
     makeMenuUI();
 }
-// TESTING
 document.querySelector('button').addEventListener('click', openFullscreen);
-// openFullscreen(); 
 
 // ---------------------------------------------------------------------------------------
 
@@ -80,9 +79,10 @@ function enterVR() {
     clearTimeout(timeout);
     timeout = setTimeout(function() {
         const curr = scene.getObjectByName('UI');
-        if (curr.visible){
-            deleteUI();
-        }
+            if (curr.visible){
+                deleteUI();
+                deleteKeyboard();
+            }
         }, 10000);
     }
 }

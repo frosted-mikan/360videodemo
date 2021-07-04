@@ -28,9 +28,6 @@ function updateButtons() {
         intersect = raycast();
     }
 
-    if (intersect) console.log(intersect.object.name);
-
-
     if (intersect && intersect.object.isUI && intersect.object.visible) {
         if (selectState) {
             if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible)) {

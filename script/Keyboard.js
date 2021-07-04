@@ -18,6 +18,7 @@ const colors = {
 };
 
 let userText, emailText, passText; // text will appear here
+
 // Determines which panel is selected 
 var toggle = {
 	aInternal: false,
@@ -34,7 +35,7 @@ var toggle = {
 	}
   }
 
-
+// Create and set up input boxes
 function keyboard () {
     const keyboardContain = new THREE.Group();
     keyboardContain.name = "keyboard";
@@ -84,8 +85,14 @@ function keyboard () {
 	// Set up listener for which panel is selected
 	userText = emailText;
 	toggle.registerListener(function() {
-		if (!toggle.a) userText = emailText;
-		else userText = passText;
+		if (!toggle.a) {
+			userText = emailText;
+			if (!scene.getObjectByName('keysFull')) makeKeyboard();
+		}
+		else {
+			userText = passText;
+			if (!scene.getObjectByName('keysFull')) makeKeyboard();	
+		}
 	});
 
 	// Set panel states
@@ -102,7 +109,6 @@ function keyboard () {
     emailPanel.setupState({
         state: "selected",
         onSet: () => {
-            scene.getObjectByName('keysFull').visible = true;
 			toggle.a = false
         }
     });
@@ -119,14 +125,26 @@ function keyboard () {
     passPanel.setupState({
         state: "selected",
         onSet: () => {
-            scene.getObjectByName('keysFull').visible = true;
 			toggle.a = true;
         }
     });
     objsToTest.push(emailPanel, passPanel);
-	makeKeyboard();
-
 }
+
+// Delete the keyboard 
+function deleteKeyboard() {
+	objsToTest.splice(15, objsToTest.length - 15); //remove keys from objsToTest
+	var obj; 
+	const curr = scene.getObjectByName('keysFull');
+	for(var i = curr.children.length - 1; i >= 0; i--) { 
+		obj = curr.children[i];
+		scene.remove(obj); 
+   }
+
+   scene.remove(curr);
+   camera.remove(curr);
+}
+
 
 // Make the actual keyboard
 function makeKeyboard() {
@@ -142,7 +160,6 @@ function makeKeyboard() {
 	});
 
     keyboard.name = "keysFull";
-    keyboard.visible = false;
 	scene.add(keyboard);
 	camera.add(keyboard); //make keyboard fixed in view
 	keyboard.position.set(0, -0.5, -1.12);
@@ -151,8 +168,8 @@ function makeKeyboard() {
 	//
 
 	keyboard.keys.forEach((key)=> {
+		key.name = "keys";
 		objsToTest.push(key);
-        key.name = "keys";
 
 		key.setupState({
 			state: 'idle',
@@ -213,7 +230,6 @@ function makeKeyboard() {
 		});
 
 	});
-
 };
 
-export { keyboard };
+export { keyboard, deleteKeyboard };

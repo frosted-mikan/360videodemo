@@ -5,7 +5,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { scene, objsToTest, dragObjs } from '/360videodemo/script/script.js';
 import { deletePopupUI, makeUnderlines, showUnder, showPop, makeVideoControls } from '/360videodemo/script/MenuHelpers.js';
-import { keyboard } from '/360videodemo/script/Keyboard.js';
+import { keyboard, deleteKeyboard } from '/360videodemo/script/Keyboard.js';
 import { makeClips, makeTranscriptText } from '/360videodemo/script/PopupContent.js';
 
 
@@ -25,7 +25,6 @@ function makePopupUI() {
         height: 0.8,
         width: 1.8, 
         alignContent: 'right'
-        // hiddenOverflow: true // container must be a Block
     }); 
     const exitContain = new ThreeMeshUI.Block({ //contains exit button
         fontFamily: font_json_bold, 
@@ -80,7 +79,8 @@ function makePopupUI() {
         attributes: selectedAttributes,
         onSet: () => {
             deletePopupUI(exit, 'exit');
-            scene.getObjectByName('keysFull').visible = false;
+            //if keyboard was created, delete it 
+            if (scene.getObjectByName('keysFull')) deleteKeyboard();
         }
     });
     exit.setupState(hoveredStateAttributes);
@@ -177,8 +177,10 @@ function makePopupUI() {
         state: "selected",
         attributes: selectedAttributes,
         onSet: () => {
+            //if keyboard was created, delete it 
+            if (scene.getObjectByName('keysFull')) deleteKeyboard();
+
             deletePopupUI(signExit, 'sign'); 
-            scene.getObjectByName('keysFull').visible = false;
         }
     });
     signExit.setupState({
@@ -217,14 +219,15 @@ function makePopupUI() {
         state: "selected",
         attributes:selectedAttributes,
         onSet: () => {
+            //delete the keyboard
+            if (scene.getObjectByName('keysFull')) deleteKeyboard();
+
             //delete existing children of popClips (including popSign)
             popClips.remove(popSign);
             const signin = scene.getObjectByName('signin');
             const text = scene.getObjectByName('clipstext');
             popClips.remove(signin, text);
 
-            //remove keyboard
-            scene.getObjectByName('keysFull').visible = false;
             //add new clip static text
             makeClips();
             popClips.add(scene.getObjectByName('newclips'));
@@ -503,7 +506,7 @@ function makeMenuUI() {
     menuContain.name = "UI";
     scene.add(menuContain);
 
-    // BUTTONS
+    // Button Attributes
     const buttonOptions = {
         width: 0.26,
         height: 0.1,
@@ -622,7 +625,7 @@ function makeMenuUI() {
     buttonCite.setupState(idleStateAttributes);
 
 
-    // Add all buttons to button menu 
+    // Add all buttons to button menu container
     const buttonContain = new ThreeMeshUI.Block({
         height: 0.1, 
         width: 1.3,
@@ -665,7 +668,7 @@ function makeMenuUI() {
     });
     objsToTest.push(menuContain);
 
-    // 2745: Add entire menu as child of camera so it stays fixed in space
+    // Optional (NUVO-2745): Add entire menu as child of camera so it stays fixed in space
     // camera.add(menuContain); 
     menuContain.position.set(0, 0.88, -1); 
 }

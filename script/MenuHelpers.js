@@ -5,6 +5,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { scene, objsToTest } from '/360videodemo/script/script.js';
 import { popupsArr, underArr } from '/360videodemo/script/MenuCreation.js';
+import { deleteKeyboard } from '/360videodemo/script/Keyboard.js';
 
 
 // Hide visibility of just the popup
@@ -37,7 +38,9 @@ function showUnder(id) {
 
 // Toggle visibility of the chosen popup
 function showPop(id) {
-    if (id != 2) scene.getObjectByName('keysFull').visible = false; //remove keyboard if not clips
+    if (id != 2) {
+        if (scene.getObjectByName('keysFull')) deleteKeyboard(); //delete keyboard if not clips
+    }
     const curr = scene.getObjectByName('popUI');
     if (!curr.visible){
         curr.visible = true;
@@ -46,7 +49,6 @@ function showPop(id) {
 		pop.visible = i === id ? true : false;
 	});
 };
-
 
 // Hide visibility of all UI present 
 function deleteUI() {
@@ -148,17 +150,12 @@ function makeVideoControls() {
         padding: 0.02
     });
     const forward = new THREE.TextureLoader().load('/360videodemo/assets/fastforward.png');
-        // // scale x2 proportional
-    forward.wrapS = THREE.RepeatWrapping;
-    forward.wrapT = THREE.RepeatWrapping;
-    forward.repeat.set(4, 4);
-
     fastForward.set({backgroundTexture: forward});
     fastForward.setupState({
         state: "selected", 
         attributes: selectedAttributes,
         onSet: () => { 
-            video.currentTime = video.duration; //30.998 sec
+            video.currentTime = video.duration; 
         }
     });
     fastForward.setupState(hoveredStateAttributes);
