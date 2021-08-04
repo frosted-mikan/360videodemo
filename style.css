@@ -143,16 +143,19 @@ video {
     bottom: 1.5em;
     object-fit: contain;
 }
+.videodiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+    padding-right: 5em;
+}
 .videodiv button {
-    position: relative;
     background-color: transparent;
     background-repeat:no-repeat;
     border: none;
     cursor:pointer;
     overflow: hidden;
     outline:none;
-    top: 7em;
-    right: 1em;
 }
 .videodiv img {
     opacity: 80%;

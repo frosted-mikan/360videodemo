@@ -1,17 +1,22 @@
-<!-- Index page without NUVO UI -->
+<!-- Simple Index Page -->
 
 <!DOCTYPE html>
 <head>
   <title>360 Video Demo</title>
+  <!-- three-mesh-ui -------------------- -->
   <script src='https://unpkg.com/three-mesh-ui'></script>
 </head>
 
 <body>
+  <!-- Container for VR  --------------------------------------->
   <div id="container"></div>
 
+  <!-- Video -------------------- -->
   <video id="video" muted crossOrigin="anonymous" playsinline style="display:none">
     <source src="360small.mp4" type="video/mp4">
   </video>  
+
+  <!-- Main js for VR ----------------------->
   <script type="module" src='script/script.js'></script>
 
 </body>

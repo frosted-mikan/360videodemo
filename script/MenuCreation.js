@@ -668,7 +668,7 @@ function makeMenuUI() {
     });
     objsToTest.push(menuContain);
 
-    // Optional (NUVO-2745): Add entire menu as child of camera so it stays fixed in space
+    // Optional: Add entire menu as child of camera so it stays fixed in space
     // camera.add(menuContain); 
     menuContain.position.set(0, 0.88, -1); 
 }

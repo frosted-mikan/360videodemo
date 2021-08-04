@@ -13,7 +13,7 @@ function deletePopupUI(obj, option) {
     //obj: exit, obj.parent: exitContain, obj.parent.parent: container or popSign
     const curr = obj.parent.parent;
     curr.visible = false;
-    if (option == 'exit') showUnder(9); //get rid of underline on menu
+    if (option === 'exit') showUnder(9); //get rid of underline on menu
 }
 
 // Make an underline, given coordinates (for the white underlines)
@@ -32,13 +32,13 @@ function makeUnderlines(x, y, z) {
 // Toggle visibility of chosen underline
 function showUnder(id) {
     underArr.forEach((under, i) => {
-		under.visible = i === id ? true : false;
+		under.visible = i == id ? true : false;
 	});
 }
 
 // Toggle visibility of the chosen popup
 function showPop(id) {
-    if (id != 2) {
+    if (id !== 2) {
         if (scene.getObjectByName('keysFull')) deleteKeyboard(); //delete keyboard if not clips
     }
     const curr = scene.getObjectByName('popUI');
@@ -46,7 +46,7 @@ function showPop(id) {
         curr.visible = true;
     }
 	popupsArr.forEach((pop, i) => {
-		pop.visible = i === id ? true : false;
+		pop.visible = i == id ? true : false;
 	});
 };
 
@@ -64,7 +64,7 @@ function menuUIVisible() {
     const curr = scene.getObjectByName('UI');
     curr.visible = true;
     curr.children.forEach(function(object){
-        if (object.name != 'popUI' && object.name != 'underline') object.visible = true;
+        if (object.name !== 'popUI' && object.name !== 'underline') object.visible = true;
     });
 }
 

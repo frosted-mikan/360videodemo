@@ -19,7 +19,7 @@ const colors = {
 
 let userText, emailText, passText; // text will appear here
 
-// Determines which panel is selected 
+// Determines which panel (email or password) is selected 
 var toggle = {
 	aInternal: false,
 	aListener: function() {},
@@ -144,7 +144,6 @@ function deleteKeyboard() {
    scene.remove(curr);
    camera.remove(curr);
 }
-
 
 // Make the actual keyboard
 function makeKeyboard() {

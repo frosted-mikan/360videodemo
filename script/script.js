@@ -48,7 +48,7 @@ function enterVR() {
 
     // trigger visibility of menu by pressing any key...except spacebar...
     document.body.onkeyup = function(e){
-        if (e.keyCode == 32){
+        if (e.keyCode === 32){
             return false;
         }
         if (scene.getObjectByName('UI').visible){
@@ -94,6 +94,7 @@ function enterVR() {
 
 // Init three.js scene
 function init() {
+    // Camera
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
     camera.layers.enable(1); // render left view when no stereo available
 
@@ -101,9 +102,10 @@ function init() {
     video.play();
     const texture = new THREE.VideoTexture(video);
 
+    // Scene
     scene = new THREE.Scene();
 
-    // Left eye
+    // Create sphere with video for left eye
     const geometry1 = new THREE.SphereGeometry(500, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry1.scale(-1, 1, 1);
@@ -115,7 +117,7 @@ function init() {
     mesh1.layers.set(1); // display in left eye only
     scene.add(mesh1);
 
-    // Right eye
+    // Create sphere with video for right eye
     const geometry2 = new THREE.SphereGeometry(500, 60, 40);
     geometry2.scale(-1, 1, 1);
 
@@ -126,7 +128,7 @@ function init() {
     mesh2.layers.set(2); // display in right eye only
     scene.add(mesh2);
 
-    // Set up renderer
+    // Renderer
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.localClippingEnabled = true; // FOR HIDDENOVERFLOW
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -147,14 +149,14 @@ function init() {
     dragControls.transformGroup = true;
 
     dragControls.addEventListener('dragstart', function () {
-        orbitControls.enabled = false;
+        orbitControls.enabled = false; //disable orbit controls in the meanwhile
     });
     dragControls.addEventListener('dragend', function () {
         orbitControls.enabled = true;
     });
 
-    //
-
+    // 
+    
     document.body.appendChild(VRButton.createButton(renderer));
 
     window.addEventListener('resize', onWindowResize);
@@ -184,8 +186,8 @@ function onSelectStart(event) {
     const controller = event.target;
     const intersection = raycast();
 
-    if (intersection && intersection.object.visible && controller.userData.selected == undefined) {
-        if (intersection.object.name == 'UI' || intersection.object.name == 'popUI'){
+    if (intersection && intersection.object.visible && controller.userData.selected === undefined) {
+        if (intersection.object.name === 'UI' || intersection.object.name === 'popUI'){
             const object = intersection.object;
             controller.attach(object);
             controller.userData.selected = object;   
@@ -198,9 +200,9 @@ function onSelectEnd(event) {
     if (controller.userData.selected !== undefined) {
         const object = controller.userData.selected;
 
-        if (object.name == 'UI'){
+        if (object.name === 'UI'){
             scene.attach(object);
-        }else if (object.name == 'popUI'){
+        }else if (object.name === 'popUI'){
             const curr = scene.getObjectByName('UI');
             curr.attach(object);
         }

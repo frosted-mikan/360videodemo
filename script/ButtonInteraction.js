@@ -9,7 +9,7 @@ import { camera, scene, objsToTest, renderer, mouse, vrControl, selectState } fr
 let curr; // keep track of current object selected
 const raycaster = new THREE.Raycaster();
 
-
+// Update state of buttons in each animation loop
 function updateButtons() {
     let intersect;
 
@@ -28,32 +28,37 @@ function updateButtons() {
         intersect = raycast();
     }
 
+    // Intersected with an object
     if (intersect && intersect.object.isUI && intersect.object.visible) {
+        // Set state as selected
         if (selectState) {
-            if (!(intersect.object.name == 'signin' && !scene.getObjectByName('clips').visible)) {
+            if (!(intersect.object.name === 'signin' && !scene.getObjectByName('clips').visible)) {
                 if (scene.getObjectByName('popsign')){
-                    if (!(intersect.object.name == 'input' && !scene.getObjectByName('popsign').visible)){
+                    if (!(intersect.object.name === 'input' && !scene.getObjectByName('popsign').visible)){
                         intersect.object.setState('selected');
-                        if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' 
-                            && intersect.object.name !='keys' && intersect.object.name != 'input'){
+                        if (intersect.object.name !== 'vidcontrols' && intersect.object.name !== 'signin' 
+                            && intersect.object.name !== 'keys' && intersect.object.name !== 'input'){
                             curr = intersect.object;
                         }
                     }
                 } else {
                     intersect.object.setState('selected');
-                    if (intersect.object.name != 'vidcontrols' && intersect.object.name != 'signin' 
-                        && intersect.object.name !='keys' && intersect.object.name != 'input'){
+                    if (intersect.object.name !== 'vidcontrols' && intersect.object.name !== 'signin' 
+                        && intersect.object.name !== 'keys' && intersect.object.name !== 'input'){
                         curr = intersect.object;
                     }
                 }
             }
-        } else {
+        }
+        // Set state as hovered 
+        else {
             intersect.object.setState('hovered');
         }
     } 
 
+    // Set state as idle
     objsToTest.forEach((obj) => {
-        if ((!intersect || obj !== intersect.object) && obj.isUI && obj != curr) {
+        if ((!intersect || obj !== intersect.object) && obj.isUI && obj !== curr) {
             obj.setState('idle');
         }
     });

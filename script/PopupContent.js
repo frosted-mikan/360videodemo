@@ -1,5 +1,5 @@
 /*
-    Extra content for the popups to resemble NUVO
+    Extra content for the popups
 */
 
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
